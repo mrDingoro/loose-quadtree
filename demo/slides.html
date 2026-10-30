@@ -1,0 +1,3129 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Рыхлое квадродерево — презентация</title>
+    <link rel="icon" href="loose-quadtree.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    />
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #11181d;
+        color: #f2f5f3;
+        font-family: 'Golos Text', Arial, sans-serif;
+      }
+
+      .viewport {
+        position: fixed;
+        inset: 0;
+      }
+
+      .deck {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 1920px;
+        height: 1080px;
+      }
+
+      .deck > section {
+        position: absolute;
+        inset: 0;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+          opacity 0.4s ease,
+          visibility 0s linear 0.4s;
+      }
+
+      .deck > section.current {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.4s ease;
+      }
+
+      .deck h1,
+      .deck h2,
+      .deck h3,
+      .deck p,
+      .deck ol,
+      .deck ul {
+        margin: 0;
+      }
+
+      .deck h1 {
+        font-size: 96px;
+        font-weight: 600;
+        line-height: 1.1;
+      }
+
+      .deck h2 {
+        font-size: 64px;
+        font-weight: 600;
+        line-height: 1.15;
+      }
+
+      .deck h3 {
+        font-size: 44px;
+        font-weight: 600;
+        line-height: 1.2;
+      }
+
+      .deck p {
+        font-size: 32px;
+        line-height: 1.4;
+      }
+
+      .deck ol,
+      .deck ul {
+        padding-left: 1.3em;
+      }
+
+      .deck div:not([style*='display']) {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .deck img {
+        display: block;
+      }
+
+      .deck table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      .deck th,
+      .deck td {
+        padding: 0.35em 0.6em;
+        border-bottom: 1px solid rgba(30, 42, 51, 0.15);
+        text-align: left;
+      }
+
+      .deck th {
+        font-weight: 600;
+        border-bottom: 2px solid #1e2a33;
+      }
+
+      .deck aside {
+        display: none;
+      }
+
+      .embed iframe {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+
+      [data-build-in] {
+        transition:
+          opacity 0.5s ease,
+          transform 0.5s ease;
+      }
+
+      [data-build-in].waiting {
+        opacity: 0;
+      }
+
+      [data-build-in^='rise'].waiting {
+        transform: translateY(40px);
+      }
+
+      .controls {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px;
+        border-radius: 10px;
+        background: rgba(17, 24, 29, 0.72);
+        font-size: 14px;
+        opacity: 0.35;
+        transition: opacity 0.2s;
+      }
+
+      .controls:hover,
+      .controls:focus-within {
+        opacity: 1;
+      }
+
+      .controls button {
+        min-width: 32px;
+        height: 32px;
+        border: 0;
+        border-radius: 7px;
+        background: none;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .controls button:hover {
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      .counter {
+        min-width: 56px;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .notes {
+        position: fixed;
+        left: 16px;
+        right: 16px;
+        bottom: 64px;
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 16px 20px;
+        border-radius: 12px;
+        background: rgba(17, 24, 29, 0.92);
+        font-size: 17px;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="viewport">
+      <main class="deck">
+        <section
+          id="cover"
+          data-transition="fade"
+          style="
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 128px;
+            background: #1e2a33;
+          "
+        >
+          <div
+            class="embed"
+            data-embed="cover"
+            style="position: absolute; top: 160px; left: 1032px; width: 760px; height: 760px"
+          ></div>
+          <p
+            style="
+              font-family: 'Golos Text', Arial, sans-serif;
+              font-size: 32px;
+              font-weight: 500;
+              color: #8fd3cc;
+            "
+          >
+            Курсовая по Computer Science, 2026
+          </p>
+          <div style="width: 880px; display: flex; flex-direction: column; gap: 32px">
+            <h1
+              style="
+                font-family: 'Golos Text', Arial, sans-serif;
+                font-size: 112px;
+                font-weight: 700;
+                line-height: 1.05;
+                letter-spacing: -2px;
+                color: #f2f5f3;
+              "
+            >
+              Рыхлое квадродерево
+            </h1>
+            <p
+              style="
+                font-family: 'Golos Text', Arial, sans-serif;
+                font-size: 40px;
+                line-height: 1.35;
+                color: #c9d6d3;
+              "
+            >
+              Как быстро найти фигуры рядом с данной — и почему обычного квадродерева для этого
+              мало.
+            </p>
+          </div>
+          <aside>
+            Привет. Я расскажу про свою курсовую: библиотеку, которая быстро отвечает, какие фигуры
+            на плоскости пересекаются с данной, лежат выше, ниже или рядом. Справа она работает
+            вживую: точки плывут, дерево перестраивается на лету, а белый квадрат — это запрос, и
+            жёлтым подсвечено то, что он нашёл. Внутри библиотеки квадродерево, и не обычное, а
+            рыхлое. Я покажу, что это такое, зачем понадобилось и как я это проверял.
+          </aside>
+        </section>
+        <section
+          id="task"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 56px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Задача: отвечать, что рядом, быстро
+          </h2>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px">
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #dde5e2;
+                border-radius: 16px;
+                padding: 40px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+              "
+            >
+              <h3 style="font-size: 40px; font-weight: 600; color: #0e7c7b">Пересекается</h3>
+              <p style="font-size: 30px; line-height: 1.4; color: #46555c">
+                Какие объекты задевают эту фигуру? Пуля и враг, взрыв и толпа.
+              </p>
+            </div>
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #dde5e2;
+                border-radius: 16px;
+                padding: 40px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+              "
+            >
+              <h3 style="font-size: 40px; font-weight: 600; color: #0e7c7b">В радиусе</h3>
+              <p style="font-size: 30px; line-height: 1.4; color: #46555c">
+                Кто ближе, чем на r? Оружие ищет цель в радиусе стрельбы.
+              </p>
+            </div>
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #dde5e2;
+                border-radius: 16px;
+                padding: 40px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+              "
+            >
+              <h3 style="font-size: 40px; font-weight: 600; color: #0e7c7b">Выше и ниже</h3>
+              <p style="font-size: 30px; line-height: 1.4; color: #46555c">
+                Какие объекты целиком над фигурой или под ней?
+              </p>
+            </div>
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #dde5e2;
+                border-radius: 16px;
+                padding: 40px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+              "
+            >
+              <h3 style="font-size: 40px; font-weight: 600; color: #0e7c7b">На лету</h3>
+              <p style="font-size: 30px; line-height: 1.4; color: #46555c">
+                Объекты появляются, двигаются и исчезают — без перестройки всего с нуля.
+              </p>
+            </div>
+          </div>
+          <p style="font-size: 32px; line-height: 1.4; color: #1e2a33">
+            <b>Главное требование:</b> время запроса не должно заметно расти, когда объектов
+            становится больше.
+          </p>
+          <aside>
+            Задача из списка курсовых. Есть много объектов на плоскости, у каждого координаты,
+            ширина и высота. Нужно быстро отвечать на вопросы: что пересекается с данной фигурой,
+            что выше, что ниже, что в радиусе. Объекты при этом всё время добавляются, двигаются и
+            удаляются — как враги в игре. И главное требование: время одного запроса почти не должно
+            зависеть от того, сколько всего объектов.
+          </aside>
+        </section>
+        <section
+          id="naive"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 56px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Простой способ — перебор всех объектов
+          </h2>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px">
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <p style="font-size: 84px; font-weight: 700; color: #1e2a33; line-height: 1">1 000</p>
+              <p style="font-size: 30px; color: #46555c; line-height: 1.4">
+                объектов — 1 000 проверок на каждый запрос
+              </p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <p style="font-size: 84px; font-weight: 700; color: #1e2a33; line-height: 1">
+                1 000 000
+              </p>
+              <p style="font-size: 30px; color: #46555c; line-height: 1.4">
+                объектов — миллион проверок, около 20 мс на один запрос
+              </p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <p style="font-size: 84px; font-weight: 700; color: #d6365a; line-height: 1">
+                10 000²
+              </p>
+              <p style="font-size: 30px; color: #46555c; line-height: 1.4">
+                если каждый из 10 000 врагов ищет соседей — 100 млн сравнений за кадр
+              </p>
+            </div>
+          </div>
+          <div
+            style="
+              background: #ffffff;
+              border: 1px solid #dde5e2;
+              border-radius: 16px;
+              padding: 40px;
+            "
+          >
+            <p style="font-size: 32px; line-height: 1.45">
+              Перебор прост и честен, но его время растёт вместе с числом объектов. Нужна структура,
+              которая сразу отбрасывает объекты, лежащие <b>далеко</b> от запроса, и смотрит только
+              на те, что рядом.
+            </p>
+          </div>
+          <aside>
+            Самое простое решение — пройти по всем объектам и проверить каждый. Это работает, но
+            время растёт линейно: на миллионе объектов один запрос занимает около 20 миллисекунд, а
+            в игре каждый враг ищет соседей, и получается квадрат — сто миллионов сравнений за кадр.
+            Значит, нужна структура, которая не смотрит на то, что далеко.
+          </aside>
+        </section>
+        <section
+          id="split"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Квадродерево: делим мир на квадраты
+          </h2>
+          <div
+            class="embed"
+            data-embed="split"
+            style="position: absolute; left: 128px; top: 260px; width: 1100px; height: 660px"
+          ></div>
+          <p
+            style="
+              position: absolute;
+              left: 1300px;
+              top: 290px;
+              width: 492px;
+              font-size: 32px;
+              line-height: 1.45;
+              color: #46555c;
+            "
+          >
+            Объекты падают по одному. Когда в ячейке становится тесно, она
+            <b style="color: #1e2a33">делится на четыре</b> — жёлтая вспышка.
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 1300px;
+              top: 560px;
+              width: 492px;
+              font-size: 32px;
+              line-height: 1.45;
+              color: #46555c;
+            "
+          >
+            Где густо — квадраты мелкие. Где пусто — остаются крупными.
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 1300px;
+              top: 800px;
+              width: 492px;
+              font-size: 24px;
+              line-height: 1.4;
+              color: #5b6b73;
+            "
+          >
+            Здесь ячейка держит 4 объекта, чтобы деление было видно. В библиотеке — 8.
+          </p>
+          <aside>
+            Вот что за деление на квадраты. Квадродерево — это ячейка мира, которая держит несколько
+            объектов. Смотрите на анимацию: объекты падают по одному, и как только в ячейке
+            становится больше четырёх, она вспыхивает и делится на четыре четверти, а объекты
+            расходятся по своим четвертям. Если какая-то четверть опять переполнена — делится и она.
+            Там, где объектов мало, деление не нужно, и ячейки остаются большими. Поэтому на
+            визуализаторе квадраты разного размера. В самой библиотеке ячейка держит восемь
+            объектов, здесь четыре — чтобы было нагляднее.
+          </aside>
+        </section>
+        <section
+          id="search"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Поиск заходит только туда, куда нужно
+          </h2>
+          <div
+            class="embed"
+            data-embed="search"
+            style="position: absolute; left: 128px; top: 250px; width: 1340px; height: 700px"
+          ></div>
+          <p
+            style="
+              position: absolute;
+              left: 1500px;
+              top: 270px;
+              width: 292px;
+              font-size: 28px;
+              line-height: 1.45;
+              color: #46555c;
+            "
+          >
+            <b style="color: #d6365a">Перебор</b> сравнивает запрос с каждым объектом — линия к
+            каждому.
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 1500px;
+              top: 520px;
+              width: 292px;
+              font-size: 28px;
+              line-height: 1.45;
+              color: #46555c;
+            "
+          >
+            <b style="color: #0e7c7b">Дерево</b> заходит только в бирюзовые ячейки. Серые отброшены
+            целиком, не глядя внутрь.
+          </p>
+          <aside>
+            Теперь поиск. Чёрный квадрат — запрос, он плавает по миру, и мир одинаковый слева и
+            справа. Слева перебор: от запроса тянется линия к каждому объекту, потому что он
+            проверяет все сто шестьдесят. Справа дерево: оно начинает с корня и спускается только в
+            те ячейки, которые задевает запрос — они обведены бирюзовым. Серые ячейки отброшены
+            целиком, вместе со всем, что в них лежит. Посмотрите на счётчик внизу: дерево проверяет
+            около десятка объектов вместо ста шестидесяти. На миллионе объектов это разница между
+            миллионом проверок и парой десятков.
+          </aside>
+        </section>
+        <section
+          id="demo-search"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">То же самое в демо</h2>
+          <div style="display: flex; gap: 56px">
+            <img
+              src="slides-img/search.png"
+              alt="Фрагмент демо: запрос-квадрат, вокруг бирюзовые ячейки, найденные фигуры жёлтые"
+              style="
+                width: 740px;
+                height: 638px;
+                object-fit: contain;
+                background: #ffffff;
+                border: 1px solid #dde5e2;
+                border-radius: 16px;
+              "
+            />
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 22px">
+              <p style="font-size: 30px; line-height: 1.4">
+                <span style="color: #8a989d"><b>Светло-серые линии</b></span> — все ячейки дерева.
+              </p>
+              <p style="font-size: 30px; line-height: 1.4">
+                <span style="color: #0e7c7b"><b>Бирюзовые рамки</b></span> — ячейки, в которые зашёл
+                запрос.
+              </p>
+              <p style="font-size: 30px; line-height: 1.4">
+                <span style="color: #0e7c7b"><b>Пунктир</b></span> — их рыхлые области (о них
+                дальше).
+              </p>
+              <p style="font-size: 30px; line-height: 1.4">
+                <b>Чёрный квадрат</b> — запрос, он следует за мышью.
+              </p>
+              <p style="font-size: 30px; line-height: 1.4">
+                <span style="color: #b98700"><b>Жёлтые фигуры</b></span> — найдены.
+              </p>
+              <div
+                style="
+                  background: #ffffff;
+                  border: 1px solid #dde5e2;
+                  border-radius: 16px;
+                  padding: 28px;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 8px;
+                "
+              >
+                <p style="font-size: 30px; line-height: 1.4">
+                  2 000 фигур на поле. Запрос проверил <b>37 записей</b> и нашёл 14.
+                </p>
+                <p style="font-size: 30px; line-height: 1.4">
+                  Через дерево — <b>16 мкс</b>, перебором — 600 мкс.
+                </p>
+              </div>
+            </div>
+          </div>
+          <aside>
+            Это кусок настоящего демо. Серая сетка — все ячейки дерева, видно, что они разного
+            размера. Бирюзовым обведены ячейки, в которые зашёл запрос, — они вокруг чёрного
+            квадрата, как на прошлой схеме. Из двух тысяч фигур запрос поштучно проверил 37 и нашёл
+            14. Время: 16 микросекунд против 600 у перебора.
+          </aside>
+        </section>
+        <section
+          id="problem"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Проблема: объект на линии раздела
+          </h2>
+          <div
+            class="embed"
+            data-embed="problem"
+            style="position: absolute; left: 128px; top: 250px; width: 720px; height: 700px"
+          ></div>
+          <p
+            style="
+              position: absolute;
+              left: 940px;
+              top: 280px;
+              width: 852px;
+              font-size: 34px;
+              line-height: 1.45;
+            "
+          >
+            Объект ездит туда-обратно. Пока он целиком в одной четверти — он лежит в ней.
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 940px;
+              top: 470px;
+              width: 852px;
+              font-size: 34px;
+              line-height: 1.45;
+            "
+          >
+            Стоит ему задеть линию раздела — он
+            <b style="color: #d6365a">не помещается ни в одну четверть</b> и застревает в корне.
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 940px;
+              top: 700px;
+              width: 852px;
+              font-size: 34px;
+              line-height: 1.45;
+            "
+          >
+            Корень видит каждый запрос. Чем больше мир — тем больше линий и застрявших объектов.
+          </p>
+          <aside>
+            Первая версия дерева была обычной, и у неё нашлась проблема. Объект кладётся в четверть,
+            только если целиком в ней помещается. Посмотрите: пока объект внутри четверти, она
+            подсвечена, он лежит в ней. Как только он задевает линию раздела, он не помещается ни в
+            левую, ни в правую — и остаётся в корне, корень краснеет. А корень видит каждый запрос.
+            Значит, все застрявшие объекты проверяются при каждом поиске. Их тем больше, чем больше
+            мир, потому что линии раздела длиннее. Это прямо нарушает главное требование задачи.
+          </aside>
+        </section>
+        <section
+          id="problem-demo"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Обычное и рыхлое дерево вживую
+          </h2>
+          <div
+            class="embed"
+            data-embed="problem-demo"
+            style="position: absolute; left: 128px; top: 250px; width: 1420px; height: 700px"
+          ></div>
+          <p
+            style="
+              position: absolute;
+              left: 1580px;
+              top: 270px;
+              width: 212px;
+              font-size: 26px;
+              line-height: 1.45;
+              color: #46555c;
+            "
+          >
+            Одни и те же тайлы на сетке, один и тот же запрос.
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 1580px;
+              top: 500px;
+              width: 212px;
+              font-size: 26px;
+              line-height: 1.45;
+              color: #46555c;
+            "
+          >
+            <b style="color: #d6365a">Малиновые</b> застряли наверху — их проверяет каждый запрос.
+          </p>
+          <aside>
+            Теперь оба дерева рядом, на одних и тех же данных — это тайлы на сетке, как в игре.
+            Такие объекты массово ложатся на линии раздела. Слева обычное дерево: малиновые точки —
+            застрявшие наверху, их почти сотня, и посмотрите на счётчик: почти каждый запрос
+            проверяет многие из них. Справа рыхлое: застрявших нет, и тот же запрос проверяет в
+            несколько раз меньше. На 50 тысячах объектов в демо это 2 000 записей против 330. А в
+            замере с плотными кучами на миллионе объектов — 8 720 записей против нуля.
+          </aside>
+        </section>
+        <section
+          id="loose"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Решение: у каждой четверти есть запас
+          </h2>
+          <div
+            class="embed"
+            data-embed="loose"
+            style="position: absolute; left: 128px; top: 250px; width: 1180px; height: 600px"
+          ></div>
+          <p
+            style="
+              position: absolute;
+              left: 1360px;
+              top: 270px;
+              width: 432px;
+              font-size: 30px;
+              line-height: 1.45;
+            "
+          >
+            <b>1.</b> Четверть выбирается по <b>центру</b> объекта.
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 1360px;
+              top: 420px;
+              width: 432px;
+              font-size: 30px;
+              line-height: 1.45;
+            "
+          >
+            <b>2.</b> Её область шире на <b style="color: #0e7c7b">¼ стороны</b> — пунктир.
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 1360px;
+              top: 570px;
+              width: 432px;
+              font-size: 30px;
+              line-height: 1.45;
+            "
+          >
+            <b>3.</b> Влез в пунктир — спускается вниз. Наверху остаются только крупные.
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 128px;
+              top: 880px;
+              width: 1664px;
+              font-size: 28px;
+              line-height: 1.4;
+              color: #46555c;
+            "
+          >
+            В коде это одно число <b style="color: #0e7c7b">looseness</b>: 0,25 — рыхлое дерево, 0 —
+            обычное. Так демо и замеры сравнивают «до» и «после» на одном и том же коде.
+          </p>
+          <aside>
+            Исправление — рыхлое дерево. Слева тот же объект в обычном дереве, справа — в рыхлом.
+            Два изменения. Первое: четверть для объекта выбирается по его центру — у объекта ровно
+            один центр, значит, ровно одна четверть. Второе: у четверти есть запас, её область
+            расширена на четверть стороны во все стороны — это пунктир. Объект спускается, если
+            влезает в этот пунктир. Смотрите: слева объект на линии краснеет и застревает в корне, а
+            справа он всё время лежит в четверти. Наверху остаются только объекты, крупные для
+            ячейки. В коде это один параметр looseness: если поставить ноль, дерево снова становится
+            обычным.
+          </aside>
+        </section>
+        <section
+          id="why-safe"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Почему поиск по рыхлым областям ничего не теряет
+          </h2>
+          <div style="display: flex; gap: 80px; align-items: center">
+            <svg
+              aria-label="Рыхлая область ребёнка целиком лежит внутри рыхлой области родителя"
+              width="620"
+              height="620"
+              viewBox="0 0 620 620"
+              style="width: 620px; height: 620px"
+            >
+              <rect x="0" y="0" width="620" height="620" fill="#FFFFFF" />
+              <rect
+                x="10"
+                y="10"
+                width="600"
+                height="600"
+                fill="none"
+                stroke="#0E7C7B"
+                stroke-width="3"
+                stroke-dasharray="14 10"
+              />
+              <rect
+                x="110"
+                y="110"
+                width="400"
+                height="400"
+                fill="none"
+                stroke="#1E2A33"
+                stroke-width="4"
+              />
+              <line x1="310" y1="110" x2="310" y2="510" stroke="#9AA7AC" stroke-width="3" />
+              <line x1="110" y1="310" x2="510" y2="310" stroke="#9AA7AC" stroke-width="3" />
+              <rect
+                x="60"
+                y="60"
+                width="300"
+                height="300"
+                fill="#E3F1EF"
+                fill-opacity="0.6"
+                stroke="#0E7C7B"
+                stroke-width="4"
+                stroke-dasharray="10 8"
+              />
+              <rect
+                x="110"
+                y="110"
+                width="200"
+                height="200"
+                fill="none"
+                stroke="#0E7C7B"
+                stroke-width="5"
+              />
+              <rect x="270" y="160" width="56" height="56" fill="#F5B400" />
+            </svg>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 28px">
+              <p style="font-size: 32px; line-height: 1.4">
+                Жёлтый объект лежит в левой верхней четверти: его центр там, и он влез в её рыхлую
+                область (бирюзовый пунктир), хотя заходит за саму ячейку.
+              </p>
+              <p style="font-size: 32px; line-height: 1.4">
+                Рыхлая область ребёнка всегда <b>внутри</b> рыхлой области родителя (внешний
+                пунктир). Значит, всё поддерево лежит внутри рыхлой области его корня.
+              </p>
+              <p style="font-size: 32px; line-height: 1.4">
+                Поэтому правило поиска честное:
+                <b>не задели рыхлую область узла — внутри точно нечего искать</b>. Накрыли её
+                целиком — забираем всё поддерево без проверок.
+              </p>
+            </div>
+          </div>
+          <aside>
+            Естественный вопрос: если объект может вылезать за свою ячейку, не потеряем ли мы его
+            при поиске? Нет. Поиск отсекает узлы не по ячейке, а по рыхлой области. Объект кладётся
+            в узел только если он внутри рыхлой области этого узла. А рыхлая область ребёнка лежит
+            внутри рыхлой области родителя, потому что у ребёнка и ячейка меньше, и запас меньше.
+            Значит, всё, что есть в поддереве, лежит в рыхлой области его корня. Если запрос её не
+            задел — там точно ничего нет. Это проверяет и отдельный тест, и сверка с полным
+            перебором.
+          </aside>
+        </section>
+        <section
+          id="two-phase"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Две фазы: сначала рамки, потом форма
+          </h2>
+          <div
+            class="embed"
+            data-embed="two-phase"
+            style="position: absolute; left: 128px; top: 250px; width: 1100px; height: 660px"
+          ></div>
+          <p
+            style="
+              position: absolute;
+              left: 1300px;
+              top: 290px;
+              width: 492px;
+              font-size: 30px;
+              line-height: 1.45;
+              color: #46555c;
+            "
+          >
+            Дерево хранит только <b style="color: #1e2a33">прямоугольные рамки</b> фигур —
+            сравнивать их дёшево.
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 1300px;
+              top: 500px;
+              width: 492px;
+              font-size: 30px;
+              line-height: 1.45;
+              color: #46555c;
+            "
+          >
+            У шара рамка — квадрат, её углы вне шара.
+            <b style="color: #b98700">Жёлтая рамка без заливки</b> — задет только угол, точная
+            проверка такого отсеивает.
+          </p>
+          <aside>
+            Дерево ничего не знает о форме фигур, оно хранит только прямоугольные рамки — сравнить
+            два прямоугольника стоит четыре сравнения чисел. Поэтому поиск идёт в две фазы. Запрос
+            здесь — круг, пунктиром его рамка. Сначала дерево отбирает кандидатов, чьи рамки
+            пересекают рамку запроса. Потом для каждого кандидата проверяется настоящая форма:
+            расстояние от центра круга до фигуры. Жёлтые — найдены. Жёлтая рамка без заливки —
+            кандидат, которого отсеяла точная проверка: угол его рамки внутри, а сама фигура
+            снаружи. Счётчики справа показывают обе фазы.
+          </aside>
+        </section>
+        <section
+          id="queries"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Четыре вопроса к пространству
+          </h2>
+          <table
+            style="font-size: 28px; color: #1e2a33; font-family: 'Golos Text', Arial, sans-serif"
+          >
+            <tr>
+              <th style="width: 30%">Метод</th>
+              <th style="width: 70%">Что находит</th>
+            </tr>
+            <tr>
+              <td>findIntersections(фигура)</td>
+              <td>Всё, что пересекает фигуру. Касание тоже считается.</td>
+            </tr>
+            <tr>
+              <td>findAbove(фигура)</td>
+              <td>
+                Всё, что целиком выше: нижний край объекта выше верхнего края фигуры. По X
+                ограничений нет.
+              </td>
+            </tr>
+            <tr>
+              <td>findBelow(фигура)</td>
+              <td>Всё, что целиком ниже — так же, только наоборот.</td>
+            </tr>
+            <tr>
+              <td>findInRadius(точка, r)</td>
+              <td>
+                Всё, до чего от точки не дальше r. Расстояние — до ближайшего края фигуры, а не до
+                центра.
+              </td>
+            </tr>
+          </table>
+          <div
+            style="
+              background: #1e2a33;
+              border-radius: 16px;
+              padding: 36px;
+              display: flex;
+              flex-direction: column;
+              gap: 6px;
+            "
+          >
+            <p
+              style="
+                font-family: 'JetBrains Mono', 'Courier New', monospace;
+                font-size: 26px;
+                line-height: 1.5;
+                color: #e8eeec;
+              "
+            >
+              space.add('wall', rectangle({ x: 0, y: 0, width: 10, height: 10 }), 'стена');
+            </p>
+            <p
+              style="
+                font-family: 'JetBrains Mono', 'Courier New', monospace;
+                font-size: 26px;
+                line-height: 1.5;
+                color: #e8eeec;
+              "
+            >
+              space.findInRadius({ x: 15, y: 5 }, 5);
+              <span style="color: #8fd3cc">// стена: до её края ровно 5</span>
+            </p>
+          </div>
+          <p style="font-size: 26px; color: #5b6b73">
+            Ось Y направлена вниз, как на экране. Фигуры: прямоугольник, круг, точка.
+          </p>
+          <aside>
+            Над деревом стоит класс SpatialSpace — это ответы на вопросы из задания. Пересечение с
+            фигурой, выше, ниже и в радиусе. Важная деталь про радиус: расстояние считается до
+            ближайшей точки фигуры, а не до её центра — длинная стена попадает в радиус, если близко
+            её край. И про выше-ниже: ищется вся полуплоскость, по X ограничения нет, как в примере
+            из задания.
+          </aside>
+        </section>
+        <section
+          id="above"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            «Выше» находит полмира — и это честно дорого
+          </h2>
+          <div style="display: flex; gap: 64px; align-items: center">
+            <img
+              src="slides-img/above.jpg"
+              alt="Запрос «выше» в демо: вся верхняя половина поля подсвечена, найденные фигуры жёлтые"
+              style="
+                width: 900px;
+                height: 563px;
+                object-fit: cover;
+                border: 1px solid #dde5e2;
+                border-radius: 16px;
+              "
+            />
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 28px">
+              <p style="font-size: 32px; line-height: 1.4">
+                Запрос «всё выше полоски» на 2 000 фигур находит <b>1 185</b> — больше половины.
+              </p>
+              <p style="font-size: 32px; line-height: 1.4">
+                Дерево — <b>420 мкс</b>, перебор — 629 мкс. Почти одинаково.
+              </p>
+              <p style="font-size: 32px; line-height: 1.4">
+                Ответ из k объектов нельзя выдать быстрее, чем за k шагов. Дерево выигрывает, когда
+                запрос <b>локальный</b>, а результат небольшой.
+              </p>
+            </div>
+          </div>
+          <aside>
+            Я специально показываю случай, где дерево почти не помогает. Запрос «выше» ищет всю
+            полуплоскость над фигурой — это больше половины мира. Ответ большой, и его в любом
+            случае нужно выписать. Поэтому дерево здесь работает примерно как перебор, а на
+            миллионах объектов бывает даже медленнее: перебор читает память подряд, а дерево прыгает
+            по узлам. Дерево нужно для локальных запросов — а в игре почти все запросы именно такие.
+          </aside>
+        </section>
+        <section
+          id="changes"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Добавить, сдвинуть, удалить — без перестройки
+          </h2>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px">
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #dde5e2;
+                border-radius: 16px;
+                padding: 40px;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+              "
+            >
+              <h3 style="font-size: 40px; font-weight: 600; color: #0e7c7b">add</h3>
+              <p style="font-size: 30px; line-height: 1.45; color: #46555c">
+                Объект спускается от корня до своего узла. Если в узле стало больше 8 объектов,
+                делится <b style="color: #1e2a33">только этот узел</b>.
+              </p>
+            </div>
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #dde5e2;
+                border-radius: 16px;
+                padding: 40px;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+              "
+            >
+              <h3 style="font-size: 40px; font-weight: 600; color: #0e7c7b">remove</h3>
+              <p style="font-size: 30px; line-height: 1.45; color: #46555c">
+                Таблица «id → узел» сразу говорит, где лежит объект. Удаляем из одного узла. Если
+                четыре соседних узла почти опустели, они
+                <b style="color: #1e2a33">склеиваются обратно</b>.
+              </p>
+            </div>
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #dde5e2;
+                border-radius: 16px;
+                padding: 40px;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+              "
+            >
+              <h3 style="font-size: 40px; font-weight: 600; color: #0e7c7b">update</h3>
+              <p style="font-size: 30px; line-height: 1.45; color: #46555c">
+                Перемещение — это удаление и вставка. Индекс не следит за объектами сам: в игре
+                враги сначала двигаются, а потом индекс обновляется
+                <b style="color: #1e2a33">один раз за кадр</b>.
+              </p>
+            </div>
+          </div>
+          <p style="font-size: 30px; line-height: 1.4; color: #1e2a33">
+            Каждая операция трогает один путь от корня до узла — это около log n шагов, а не n.
+          </p>
+          <aside>
+            Второе требование задачи — изменения без полного перестроения. Добавление: объект
+            спускается до своего узла, и если узел переполнен, делится только он. Удаление: есть
+            таблица от id к узлу, поэтому объект не ищем, а сразу убираем из нужного узла. А если
+            вокруг стало пусто, четыре узла склеиваются обратно — про это ещё будет в найденных
+            ошибках. Перемещение — удалить и вставить. Индекс сам не следит за объектами, это
+            сделано специально: в игре все враги сначала делают шаг, а потом индекс один раз за кадр
+            обновляется.
+          </aside>
+        </section>
+        <section
+          id="root"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Мир не нужно знать заранее: корень растёт сам
+          </h2>
+          <div
+            class="embed"
+            data-embed="root"
+            style="position: absolute; left: 128px; top: 250px; width: 1100px; height: 660px"
+          ></div>
+          <p
+            style="
+              position: absolute;
+              left: 1300px;
+              top: 290px;
+              width: 492px;
+              font-size: 30px;
+              line-height: 1.45;
+              color: #46555c;
+            "
+          >
+            Каждый новый объект — дальше прошлого. Если он не влезает, корень
+            <b style="color: #1e2a33">удваивается в его сторону</b>.
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 1300px;
+              top: 520px;
+              width: 492px;
+              font-size: 30px;
+              line-height: 1.45;
+              color: #46555c;
+            "
+          >
+            Старый корень целиком становится <b style="color: #0e7c7b">четвертью нового</b> —
+            вспышка. Ни один объект не переносится.
+          </p>
+          <aside>
+            Ещё одно преимущество перед сеткой: не нужно заранее знать размеры мира. Первый объект
+            создаёт маленький корень. Каждый следующий объект на анимации появляется дальше. Если он
+            не помещается в корень, корень удваивается в его сторону, а старый корень целиком
+            становится одной из четвертей нового — вспышка показывает, где он теперь. Объекты не
+            переносятся, меняется только верхушка дерева. Камера отъезжает, чтобы было видно весь
+            корень, а сторона корня растёт как степень двойки.
+          </aside>
+        </section>
+        <section
+          id="bench"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Замер: запрос перестал зависеть от n
+          </h2>
+          <p style="font-size: 30px; line-height: 1.4; color: #46555c">
+            Сколько записей поштучно проверяет запрос 16×16. Мир растёт вместе с числом объектов.
+          </p>
+          <div
+            style="
+              position: absolute;
+              left: 160px;
+              top: 900px;
+              width: 1120px;
+              height: 3px;
+              background: #1e2a33;
+            "
+          ></div>
+          <div
+            data-build-in="rise 1"
+            style="
+              position: absolute;
+              left: 200px;
+              top: 871px;
+              width: 100px;
+              height: 29px;
+              background: #d6365a;
+              border-radius: 6px 6px 0 0;
+            "
+          ></div>
+          <p
+            data-build-in="rise 1"
+            style="
+              position: absolute;
+              left: 190px;
+              top: 825px;
+              width: 120px;
+              font-size: 30px;
+              font-weight: 700;
+              text-align: center;
+              color: #d6365a;
+            "
+          >
+            19
+          </p>
+          <div
+            data-build-in="rise 1"
+            style="
+              position: absolute;
+              left: 312px;
+              top: 874px;
+              width: 100px;
+              height: 26px;
+              background: #0e7c7b;
+              border-radius: 6px 6px 0 0;
+            "
+          ></div>
+          <p
+            data-build-in="rise 1"
+            style="
+              position: absolute;
+              left: 302px;
+              top: 828px;
+              width: 120px;
+              font-size: 30px;
+              font-weight: 700;
+              text-align: center;
+              color: #0e7c7b;
+            "
+          >
+            17
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 180px;
+              top: 916px;
+              width: 252px;
+              font-size: 28px;
+              text-align: center;
+              color: #46555c;
+            "
+          >
+            1 000
+          </p>
+          <div
+            data-build-in="rise 2"
+            style="
+              position: absolute;
+              left: 480px;
+              top: 833px;
+              width: 100px;
+              height: 67px;
+              background: #d6365a;
+              border-radius: 6px 6px 0 0;
+            "
+          ></div>
+          <p
+            data-build-in="rise 2"
+            style="
+              position: absolute;
+              left: 470px;
+              top: 787px;
+              width: 120px;
+              font-size: 30px;
+              font-weight: 700;
+              text-align: center;
+              color: #d6365a;
+            "
+          >
+            44
+          </p>
+          <div
+            data-build-in="rise 2"
+            style="
+              position: absolute;
+              left: 592px;
+              top: 874px;
+              width: 100px;
+              height: 26px;
+              background: #0e7c7b;
+              border-radius: 6px 6px 0 0;
+            "
+          ></div>
+          <p
+            data-build-in="rise 2"
+            style="
+              position: absolute;
+              left: 582px;
+              top: 828px;
+              width: 120px;
+              font-size: 30px;
+              font-weight: 700;
+              text-align: center;
+              color: #0e7c7b;
+            "
+          >
+            17
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 460px;
+              top: 916px;
+              width: 252px;
+              font-size: 28px;
+              text-align: center;
+              color: #46555c;
+            "
+          >
+            10 000
+          </p>
+          <div
+            data-build-in="rise 3"
+            style="
+              position: absolute;
+              left: 760px;
+              top: 671px;
+              width: 100px;
+              height: 229px;
+              background: #d6365a;
+              border-radius: 6px 6px 0 0;
+            "
+          ></div>
+          <p
+            data-build-in="rise 3"
+            style="
+              position: absolute;
+              left: 750px;
+              top: 625px;
+              width: 120px;
+              font-size: 30px;
+              font-weight: 700;
+              text-align: center;
+              color: #d6365a;
+            "
+          >
+            151
+          </p>
+          <div
+            data-build-in="rise 3"
+            style="
+              position: absolute;
+              left: 872px;
+              top: 876px;
+              width: 100px;
+              height: 24px;
+              background: #0e7c7b;
+              border-radius: 6px 6px 0 0;
+            "
+          ></div>
+          <p
+            data-build-in="rise 3"
+            style="
+              position: absolute;
+              left: 862px;
+              top: 830px;
+              width: 120px;
+              font-size: 30px;
+              font-weight: 700;
+              text-align: center;
+              color: #0e7c7b;
+            "
+          >
+            16
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 740px;
+              top: 916px;
+              width: 252px;
+              font-size: 28px;
+              text-align: center;
+              color: #46555c;
+            "
+          >
+            100 000
+          </p>
+          <div
+            data-build-in="rise 4"
+            style="
+              position: absolute;
+              left: 1040px;
+              top: 360px;
+              width: 100px;
+              height: 540px;
+              background: #d6365a;
+              border-radius: 6px 6px 0 0;
+            "
+          ></div>
+          <p
+            data-build-in="rise 4"
+            style="
+              position: absolute;
+              left: 1030px;
+              top: 314px;
+              width: 120px;
+              font-size: 30px;
+              font-weight: 700;
+              text-align: center;
+              color: #d6365a;
+            "
+          >
+            356
+          </p>
+          <div
+            data-build-in="rise 4"
+            style="
+              position: absolute;
+              left: 1152px;
+              top: 877px;
+              width: 100px;
+              height: 23px;
+              background: #0e7c7b;
+              border-radius: 6px 6px 0 0;
+            "
+          ></div>
+          <p
+            data-build-in="rise 4"
+            style="
+              position: absolute;
+              left: 1142px;
+              top: 831px;
+              width: 120px;
+              font-size: 30px;
+              font-weight: 700;
+              text-align: center;
+              color: #0e7c7b;
+            "
+          >
+            15
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 1020px;
+              top: 916px;
+              width: 252px;
+              font-size: 28px;
+              text-align: center;
+              color: #46555c;
+            "
+          >
+            1 000 000
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 1360px;
+              top: 360px;
+              width: 432px;
+              font-size: 30px;
+              line-height: 1.45;
+            "
+          >
+            <span style="color: #d6365a"><b>Обычное дерево:</b></span> 19 → 356, почти в 19 раз
+            больше.
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 1360px;
+              top: 500px;
+              width: 432px;
+              font-size: 30px;
+              line-height: 1.45;
+            "
+          >
+            <span style="color: #0e7c7b"><b>Рыхлое:</b></span> 17 → 15, стоит на месте.
+          </p>
+          <p
+            data-build-in="fade 5"
+            style="
+              position: absolute;
+              left: 1360px;
+              top: 640px;
+              width: 432px;
+              font-size: 30px;
+              line-height: 1.45;
+            "
+          >
+            Время на миллионе: <b>15 мкс</b> у рыхлого против <b>21 мс</b> у перебора.
+          </p>
+          <aside>
+            Главный замер. Плотность объектов постоянная: мир растёт вместе с их числом, и в
+            маленький квадрат запроса всегда попадает примерно одно и то же число объектов. Столбики
+            — сколько записей запрос проверил поштучно, это число не зависит от компьютера.
+            Малиновые — обычное дерево: с 19 до 356, в девятнадцать раз. Бирюзовые — рыхлое: около
+            шестнадцати при любом размере мира. Это и есть главное требование задачи. По времени на
+            миллионе объектов рыхлое дерево отвечает за 15 микросекунд, перебор — за 21
+            миллисекунду, в тысячу раз дольше.
+          </aside>
+        </section>
+        <section
+          id="game"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 36px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Кадр игры: где индекс начинает окупаться
+          </h2>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 24px">
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #dde5e2;
+                border-radius: 16px;
+                padding: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+              "
+            >
+              <p style="font-size: 36px; font-weight: 700; line-height: 1; color: #0e7c7b">1</p>
+              <p style="font-size: 26px; line-height: 1.4; color: #46555c">
+                Враги делают шаг к игроку, индекс обновляется
+              </p>
+            </div>
+            <div
+              style="
+                background: #fff6dc;
+                border: 1px solid #f5b400;
+                border-radius: 16px;
+                padding: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+              "
+            >
+              <p style="font-size: 36px; font-weight: 700; line-height: 1; color: #b98700">2</p>
+              <p style="font-size: 26px; line-height: 1.4; color: #1e2a33">
+                Каждый враг ищет соседей, чтобы не налезать на них
+              </p>
+            </div>
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #dde5e2;
+                border-radius: 16px;
+                padding: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+              "
+            >
+              <p style="font-size: 36px; font-weight: 700; line-height: 1; color: #0e7c7b">3</p>
+              <p style="font-size: 26px; line-height: 1.4; color: #46555c">
+                6 стволов игрока ищут ближайшую цель
+              </p>
+            </div>
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #dde5e2;
+                border-radius: 16px;
+                padding: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+              "
+            >
+              <p style="font-size: 36px; font-weight: 700; line-height: 1; color: #0e7c7b">4</p>
+              <p style="font-size: 26px; line-height: 1.4; color: #46555c">
+                Граната задевает всех в радиусе
+              </p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 56px; align-items: flex-start">
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 20px">
+              <p style="font-size: 30px; line-height: 1.45">
+                Самый тяжёлый — <b>шаг 2</b>. При 1&#160;000 врагов перебор сравнивает каждого со
+                всеми: 1&#160;000 × 1&#160;000 = <b>миллион сравнений</b> за кадр.
+              </p>
+              <p style="font-size: 30px; line-height: 1.45">
+                С индексом каждый враг смотрит только на соседей рядом. Поэтому перебор растёт как
+                n², а индекс — почти линейно.
+              </p>
+            </div>
+            <table
+              style="
+                width: 760px;
+                font-size: 26px;
+                color: #1e2a33;
+                font-family: 'Golos Text', Arial, sans-serif;
+              "
+            >
+              <tr>
+                <th style="width: 30%; text-align: right">Врагов</th>
+                <th style="width: 35%; text-align: right">С индексом, мс</th>
+                <th style="width: 35%; text-align: right">Перебор, мс</th>
+              </tr>
+              <tr>
+                <td style="text-align: right">100</td>
+                <td style="text-align: right">0,65</td>
+                <td style="text-align: right">0,23</td>
+              </tr>
+              <tr>
+                <td style="text-align: right">1&#160;000</td>
+                <td style="text-align: right">3,0</td>
+                <td style="text-align: right">5,2</td>
+              </tr>
+              <tr style="background: #e3f1ef">
+                <td style="text-align: right"><b>3&#160;000</b></td>
+                <td style="text-align: right"><b>18</b></td>
+                <td style="text-align: right"><b>38</b></td>
+              </tr>
+              <tr>
+                <td style="text-align: right">10&#160;000</td>
+                <td style="text-align: right">87</td>
+                <td style="text-align: right">368</td>
+              </tr>
+            </table>
+          </div>
+          <p style="font-size: 30px; line-height: 1.45">
+            Для плавной игры на кадр есть 16,7 мс. При 3&#160;000 врагов с индексом это около
+            <b>55 кадров в секунду</b>, перебором — около <b style="color: #d6365a">26</b>: игра
+            заметно дёргается. А на 100 врагах индекс не нужен — перебор даже быстрее.
+          </p>
+          <aside>
+            Это пример examples/horde.ts — кадр игры-арены. В каждом кадре четыре шага: враги шагают
+            к игроку и индекс обновляется, каждый враг ищет соседей, чтобы не налезать, шесть
+            стволов игрока ищут ближайшую цель, граната задевает всех рядом. Самый тяжёлый — второй
+            шаг. Перебором при тысяче врагов это миллион сравнений за кадр, потому что каждый
+            сравнивается со всеми. С индексом каждый смотрит только на соседей. Если перевести в
+            кадры в секунду — считая только эту работу, без отрисовки — при трёх тысячах врагов с
+            индексом выходит около 55 кадров, перебором около 26, игра дёргается. Честно: на сотне
+            врагов индекс не нужен, перебор даже быстрее, потому что дерево надо обновлять каждый
+            кадр.
+          </aside>
+        </section>
+        <section
+          id="limits"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Где дерево не помогает
+          </h2>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px">
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #dde5e2;
+                border-radius: 16px;
+                padding: 36px;
+                display: flex;
+                flex-direction: column;
+                gap: 18px;
+              "
+            >
+              <h3 style="font-size: 36px; font-weight: 600">Большой ответ</h3>
+              <p style="font-size: 26px; line-height: 1.4; color: #46555c">
+                <b style="color: #1e2a33">Пример:</b> «выше» на 2&#160;000 фигур находит 1&#160;185.
+                Дерево — 420 мкс, перебор — 629.
+              </p>
+              <p style="font-size: 26px; line-height: 1.4; color: #46555c">
+                <b style="color: #1e2a33">Почему:</b> ответ из 1&#160;185 объектов нельзя выдать
+                быстрее, чем выписав все 1&#160;185.
+              </p>
+              <p style="font-size: 26px; line-height: 1.4; color: #46555c">
+                <b style="color: #1e2a33">Что делать:</b> ничего, это предел любого способа. Дерево
+                нужно для вопросов «что рядом».
+              </p>
+            </div>
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #dde5e2;
+                border-radius: 16px;
+                padding: 36px;
+                display: flex;
+                flex-direction: column;
+                gap: 18px;
+              "
+            >
+              <h3 style="font-size: 36px; font-weight: 600">Мало объектов</h3>
+              <p style="font-size: 26px; line-height: 1.4; color: #46555c">
+                <b style="color: #1e2a33">Пример:</b> в кадре игры со 100 врагами перебор быстрее
+                индекса: 0,23 против 0,65 мс.
+              </p>
+              <p style="font-size: 26px; line-height: 1.4; color: #46555c">
+                <b style="color: #1e2a33">Почему:</b> дерево надо обновлять каждый кадр, а сотню
+                объектов и так сравнить быстро.
+              </p>
+              <p style="font-size: 26px; line-height: 1.4; color: #46555c">
+                <b style="color: #1e2a33">Что делать:</b> на сотнях объектов обойтись перебором.
+              </p>
+            </div>
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #dde5e2;
+                border-radius: 16px;
+                padding: 36px;
+                display: flex;
+                flex-direction: column;
+                gap: 18px;
+              "
+            >
+              <h3 style="font-size: 36px; font-weight: 600">Огромные объекты</h3>
+              <p style="font-size: 26px; line-height: 1.4; color: #46555c">
+                <b style="color: #1e2a33">Пример:</b> каждый десятый объект — в четверть мира. На
+                миллионе запрос занимает 1&#160;066 мкс вместо 15.
+              </p>
+              <p style="font-size: 26px; line-height: 1.4; color: #46555c">
+                <b style="color: #1e2a33">Почему:</b> такой объект не влезает в мелкую ячейку и
+                висит наверху — его проверяет почти каждый запрос.
+              </p>
+              <p style="font-size: 26px; line-height: 1.4; color: #46555c">
+                <b style="color: #1e2a33">Что делать:</b> терпимо — это всё равно в 19 раз быстрее
+                перебора.
+              </p>
+            </div>
+          </div>
+          <p style="font-size: 28px; line-height: 1.4">
+            Почему запас ¼, а не ½, как в учебниках: с ½ соседние ячейки сильнее перекрываются, и
+            запрос заходит в лишние. На миллионе мелких объектов ¼ — <b>16 мкс</b>, ½ —
+            <b>28 мкс</b>.
+          </p>
+          <aside>
+            Важно честно сказать, где структура не помогает. Первое — большой ответ. Запрос «выше»
+            находит больше половины фигур, и выдать такой ответ быстрее, чем перебрав все найденные,
+            нельзя никаким способом. Дерево нужно для вопросов «что рядом». Второе — мало объектов.
+            В кадре игры со ста врагами перебор быстрее, потому что дерево приходится обновлять
+            каждый кадр, а сравнить сотню объектов и так быстро. Третье — огромные объекты. Если
+            каждый десятый объект размером в четверть мира, он не помещается в мелкие ячейки и висит
+            наверху, его проверяет почти каждый запрос. На миллионе объектов запрос замедляется с 15
+            до тысячи микросекунд — но это всё равно в девятнадцать раз быстрее перебора. И почему
+            запас четверть: я замерил и половину, как в учебниках, — она почти вдвое медленнее.
+          </aside>
+        </section>
+        <section
+          id="bugs"
+          data-transition="fade"
+          style="
+            background: #1e2a33;
+            color: #f2f5f3;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Две ошибки, которые нашлись при проверке
+          </h2>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px">
+            <div
+              style="
+                background: #26363f;
+                border-radius: 16px;
+                padding: 48px;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+              "
+            >
+              <h3 style="font-size: 40px; font-weight: 600; color: #f5b400">Объект через ноль</h3>
+              <p style="font-size: 30px; line-height: 1.45; color: #c9d6d3">
+                <b style="color: #f2f5f3">Как нашёл:</b> демо упало, когда шар у края поля оказался
+                на координатах от −1 до 1. Край первого корня дерева всегда лежал на нуле, и такой
+                шар не помещался ни в один квадрат.
+              </p>
+              <p style="font-size: 30px; line-height: 1.45; color: #c9d6d3">
+                <b style="color: #f2f5f3">Исправил:</b> угол корня берётся от угла самого объекта.
+              </p>
+            </div>
+            <div
+              style="
+                background: #26363f;
+                border-radius: 16px;
+                padding: 48px;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+              "
+            >
+              <h3 style="font-size: 40px; font-weight: 600; color: #f5b400">Узлы не склеивались</h3>
+              <p style="font-size: 30px; line-height: 1.45; color: #c9d6d3">
+                <b style="color: #f2f5f3">Как нашёл:</b> замер памяти вкладки с демо — за 2 минуты
+                движения 6,7 → 9 МБ, узлов дерева 4&#160;345 → 16&#160;429.
+              </p>
+              <p style="font-size: 30px; line-height: 1.45; color: #c9d6d3">
+                <b style="color: #f2f5f3">Исправил:</b> почти пустые узлы склеиваются обратно.
+                Память держится около 7 МБ.
+              </p>
+            </div>
+          </div>
+          <p style="font-size: 30px; line-height: 1.4; color: #8fd3cc">
+            На каждую теперь есть тест: на старом коде он падает, на исправленном проходит.
+          </p>
+          <aside>
+            Две настоящие ошибки, которые нашлись уже после того, как дерево было написано. Первую
+            показало демо: шар у левого края поля попал на координаты от минус одного до одного, и
+            дерево не смогло построить корень, потому что край корня всегда лежал ровно на нуле.
+            Исправил: угол корня берётся от угла объекта. Вторую — замер памяти вкладки: когда
+            объекты двигались, дерево только делилось и никогда не склеивалось обратно, за две
+            минуты число узлов выросло вчетверо. Исправил: почти пустые узлы склеиваются. На обе
+            ошибки есть тесты. Следующий слайд показывает вторую ошибку вживую.
+          </aside>
+        </section>
+        <section
+          id="merge-anim"
+          data-transition="fade"
+          style="
+            background: #f4f6f5;
+            color: #1e2a33;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">
+            Вживую: узлы, которые не склеивались
+          </h2>
+          <div
+            class="embed"
+            data-embed="merge-anim"
+            style="position: absolute; left: 128px; top: 250px; width: 1420px; height: 700px"
+          ></div>
+          <p
+            style="
+              position: absolute;
+              left: 1580px;
+              top: 270px;
+              width: 212px;
+              font-size: 26px;
+              line-height: 1.45;
+              color: #46555c;
+            "
+          >
+            Куча объектов кружит по миру.
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 1580px;
+              top: 430px;
+              width: 212px;
+              font-size: 26px;
+              line-height: 1.45;
+              color: #46555c;
+            "
+          >
+            <b style="color: #d6365a">Слева</b> деление остаётся там, где куча прошла.
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 1580px;
+              top: 650px;
+              width: 212px;
+              font-size: 26px;
+              line-height: 1.45;
+              color: #46555c;
+            "
+          >
+            <b style="color: #0e7c7b">Справа</b> пустые узлы склеиваются обратно.
+          </p>
+          <aside>
+            Вот вторая ошибка на анимации. Куча объектов кружит по миру. Там, где она проходит,
+            дерево делится — это правильно. Но слева, как было в моей первой версии, деление
+            остаётся и после того, как куча ушла: посмотрите на счётчик узлов — он только растёт.
+            Справа исправленная версия: если в четырёх соседних узлах почти ничего не осталось, они
+            склеиваются обратно в родителя. Число узлов держится. В демо это было видно по памяти
+            вкладки: 6,7 мегабайта превращались в 9 за две минуты, а теперь держатся около 7.
+          </aside>
+        </section>
+        <section
+          id="end"
+          data-transition="fade"
+          style="
+            background: #1e2a33;
+            color: #f2f5f3;
+            font-family: 'Golos Text', Arial, sans-serif;
+            padding: 128px 128px 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+          "
+        >
+          <h2 style="font-size: 64px; font-weight: 600; line-height: 1.1">Итог</h2>
+          <div style="display: grid; grid-template-columns: 600px 1fr; gap: 0px 64px">
+            <div style="border-top: 1px solid #3a4e58; padding: 32px 0px 32px 0px">
+              <p style="font-size: 38px; font-weight: 600; line-height: 1.25; color: #f5b400">
+                Поиск не замедляется, когда объектов становится больше
+              </p>
+            </div>
+            <div style="border-top: 1px solid #3a4e58; padding: 32px 0px 32px 0px">
+              <p style="font-size: 30px; line-height: 1.45; color: #c9d6d3">
+                Когда объектов миллион, запрос проверяет около 16 из них, а не все. Это 15
+                микросекунд вместо 21 миллисекунды у полного перебора.
+              </p>
+            </div>
+            <div style="border-top: 1px solid #3a4e58; padding: 32px 0px 32px 0px">
+              <p style="font-size: 38px; font-weight: 600; line-height: 1.25; color: #f5b400">
+                Объекты можно добавлять, двигать и удалять на ходу
+              </p>
+            </div>
+            <div style="border-top: 1px solid #3a4e58; padding: 32px 0px 32px 0px">
+              <p style="font-size: 30px; line-height: 1.45; color: #c9d6d3">
+                Дерево не перестраивается целиком — меняется только одна его ветка. Лишние ячейки
+                склеиваются обратно, поэтому память не растёт.
+              </p>
+            </div>
+            <div
+              style="
+                border-top: 1px solid #3a4e58;
+                border-bottom: 1px solid #3a4e58;
+                padding: 32px 0px 32px 0px;
+              "
+            >
+              <p style="font-size: 38px; font-weight: 600; line-height: 1.25; color: #f5b400">
+                Четыре вида поиска
+              </p>
+            </div>
+            <div
+              style="
+                border-top: 1px solid #3a4e58;
+                border-bottom: 1px solid #3a4e58;
+                padding: 32px 0px 32px 0px;
+              "
+            >
+              <p style="font-size: 30px; line-height: 1.45; color: #c9d6d3">
+                Что пересекается с фигурой, что выше неё, что ниже и что в радиусе от точки.
+              </p>
+            </div>
+          </div>
+          <p
+            style="
+              position: absolute;
+              left: 128px;
+              bottom: 112px;
+              width: 1664px;
+              font-size: 24px;
+              line-height: 1.4;
+              color: #8fa3a8;
+            "
+          >
+            Проверено тестами: ответы дерева совпадают с полным перебором.
+          </p>
+          <p
+            style="
+              position: absolute;
+              left: 128px;
+              bottom: 64px;
+              width: 1664px;
+              font-size: 24px;
+              line-height: 1.4;
+              color: #8fd3cc;
+            "
+          >
+            Код: github.com/mrDingoro/loose-quadtree · Демо и презентация:
+            mrdingoro.github.io/loose-quadtree
+          </p>
+          <aside>
+            Подведу итог. Первое и главное: поиск не замедляется, когда объектов становится больше.
+            Когда их миллион, запрос проверяет около шестнадцати, а не все, — это 15 микросекунд
+            против 21 миллисекунды у полного перебора. Второе: объекты можно добавлять, двигать и
+            удалять на ходу. Дерево не перестраивается, меняется только одна ветка, а лишние ячейки
+            склеиваются обратно, так что память не растёт. Третье: библиотека умеет все четыре вида
+            поиска из задания — пересечение с фигурой, выше, ниже и в радиусе. Всё это проверено
+            тестами: ответы дерева совпадают с полным перебором. Спасибо, готов ответить на вопросы.
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <div class="notes" hidden></div>
+
+    <nav class="controls" aria-label="Листание слайдов">
+      <button type="button" data-go="-1" aria-label="Назад">←</button>
+      <span class="counter"></span>
+      <button type="button" data-go="1" aria-label="Вперёд">→</button>
+      <button type="button" data-notes aria-label="Заметки докладчика">N</button>
+      <button type="button" data-fullscreen aria-label="Во весь экран">⛶</button>
+    </nav>
+
+    <script type="text/plain" id="embed-core">
+      const C = {
+        ink: '#1E2A33',
+        teal: '#0E7C7B',
+        yellow: '#F5B400',
+        red: '#D6365A',
+        gray: '#9AA7AC',
+        cell: '#D3DEDA',
+        soft: '#E3F1EF',
+        bg: '#FFFFFF',
+        mute: '#5B6B73',
+      };
+      const hit = (a, b) => a.x <= b.x + b.w && b.x <= a.x + a.w && a.y <= b.y + b.h && b.y <= a.y + a.h;
+      let rs = 7;
+      const rnd = () => (rs = (Math.imul(rs, 1664525) + 1013904223) >>> 0) / 4294967296;
+      class QT {
+        constructor(cap, k, merge, cell) {
+          this.cap = cap;
+          this.k = k;
+          this.merge = merge;
+          this.own = new Map();
+          this.root = cell ? this.mk(cell.x, cell.y, cell.s, 0, null) : null;
+          this.checked = 0;
+          this.visited = [];
+        }
+        mk(x, y, s, d, p) {
+          const m = s * this.k;
+          return {
+            x,
+            y,
+            s,
+            d,
+            p,
+            l: { x: x - m, y: y - m, w: s + 2 * m, h: s + 2 * m },
+            e: new Map(),
+            c: null,
+            t: performance.now(),
+          };
+        }
+        fits(n, b) {
+          const l = n.l;
+          return b.x >= l.x && b.y >= l.y && b.x + b.w <= l.x + l.w && b.y + b.h <= l.y + l.h;
+        }
+        child(n, b) {
+          if (!n.c) return null;
+          const h = n.s / 2,
+            i = (b.y + b.h / 2 < n.y + h ? 0 : 2) + (b.x + b.w / 2 < n.x + h ? 0 : 1),
+            c = n.c[i];
+          return this.fits(c, b) ? c : null;
+        }
+        inRoot(b) {
+          const r = this.root;
+          return b.x >= r.x && b.y >= r.y && b.x + b.w <= r.x + r.s && b.y + b.h <= r.y + r.s;
+        }
+        grow(b) {
+          if (!this.root) {
+            let s = 1;
+            const x = Math.floor(b.x),
+              y = Math.floor(b.y);
+            while (x + s < b.x + b.w || y + s < b.y + b.h) s *= 2;
+            this.root = this.mk(x, y, s, 0, null);
+            return;
+          }
+          while (!this.inRoot(b)) {
+            const o = this.root,
+              s = o.s,
+              L = b.x < o.x,
+              T = b.y < o.y,
+              r = this.mk(L ? o.x - s : o.x, T ? o.y - s : o.y, 2 * s, o.d - 1, null);
+            r.c = [0, 1, 2, 3].map((i) => this.mk(r.x + (i & 1) * s, r.y + (i >> 1) * s, s, o.d, r));
+            r.c[(T ? 2 : 0) + (L ? 1 : 0)] = o;
+            o.p = r;
+            this.root = r;
+            if (this.onGrow) this.onGrow(o, r);
+          }
+        }
+        add(o) {
+          this.grow(o.b);
+          let n = this.root,
+            c;
+          while ((c = this.child(n, o.b))) n = c;
+          n.e.set(o.id, o);
+          this.own.set(o.id, n);
+          this.split(n);
+        }
+        split(n) {
+          if (n.c || n.e.size <= this.cap || n.d >= 7) return;
+          const h = n.s / 2;
+          n.c = [0, 1, 2, 3].map((i) => this.mk(n.x + (i & 1) * h, n.y + (i >> 1) * h, h, n.d + 1, n));
+          for (const o of [...n.e.values()]) {
+            const c = this.child(n, o.b);
+            if (c) {
+              n.e.delete(o.id);
+              c.e.set(o.id, o);
+              this.own.set(o.id, c);
+            }
+          }
+          for (const c of n.c) this.split(c);
+        }
+        del(id) {
+          const n = this.own.get(id);
+          if (!n) return;
+          n.e.delete(id);
+          this.own.delete(id);
+          if (this.merge) this.tidy(n.c ? n : n.p);
+        }
+        tidy(n) {
+          for (; n && n.c; n = n.p) {
+            if (n.c.some((c) => c.c)) return;
+            let t = n.e.size;
+            for (const c of n.c) t += c.e.size;
+            if (t > this.cap / 2) return;
+            for (const c of n.c)
+              for (const o of c.e.values()) {
+                n.e.set(o.id, o);
+                this.own.set(o.id, n);
+              }
+            n.c = null;
+          }
+        }
+        move(o) {
+          this.del(o.id);
+          this.add(o);
+        }
+        query(a) {
+          const out = [];
+          this.checked = 0;
+          this.visited = [];
+          const st = this.root ? [this.root] : [];
+          while (st.length) {
+            const n = st.pop();
+            if (!hit(n.l, a)) continue;
+            this.visited.push(n);
+            for (const o of n.e.values()) {
+              this.checked++;
+              if (hit(o.b, a)) out.push(o);
+            }
+            if (n.c) st.push(...n.c);
+          }
+          return out;
+        }
+        nodes() {
+          const r = [],
+            st = this.root ? [this.root] : [];
+          while (st.length) {
+            const n = st.pop();
+            r.push(n);
+            if (n.c) st.push(...n.c);
+          }
+          return r;
+        }
+      }
+      const cv = document.getElementById('c'),
+        g = cv.getContext('2d');
+      let W = 0,
+        H = 0;
+      function size() {
+        const d = devicePixelRatio || 1;
+        W = innerWidth;
+        H = innerHeight;
+        cv.width = W * d;
+        cv.height = H * d;
+        g.setTransform(d, 0, 0, d, 0, 0);
+      }
+      addEventListener('resize', size);
+      size();
+      function frame(fn) {
+        let last = performance.now();
+        const f = (t) => {
+          const dt = Math.min(0.05, (t - last) / 1000);
+          last = t;
+          g.clearRect(0, 0, W, H);
+          fn(t, dt);
+          requestAnimationFrame(f);
+        };
+        requestAnimationFrame(f);
+      }
+      function panel(x, y, s, bg) {
+        g.fillStyle = bg || C.bg;
+        g.beginPath();
+        g.roundRect(x, y, s, s, 14);
+        g.fill();
+      }
+      function cells(tree, X, Y, k, col, lw) {
+        g.strokeStyle = col || C.cell;
+        g.lineWidth = lw || 1.5;
+        g.beginPath();
+        for (const n of tree.nodes()) g.rect(X + n.x * k, Y + n.y * k, n.s * k, n.s * k);
+        g.stroke();
+      }
+      function box(b, X, Y, k) {
+        g.rect(X + b.x * k, Y + b.y * k, Math.max(b.w * k, 2), Math.max(b.h * k, 2));
+      }
+      function dot(x, y, r) {
+        g.moveTo(x + r, y);
+        g.arc(x, y, r, 0, 7);
+      }
+      function txt(s, x, y, sz, col, w, al) {
+        g.font = (w || 500) + ' ' + sz + 'px system-ui,-apple-system,Segoe UI,sans-serif';
+        g.fillStyle = col || C.ink;
+        g.textAlign = al || 'left';
+        g.fillText(s, x, y);
+      }
+    </script>
+    <script type="text/plain" id="embed-cover">
+      const WORLD = 512;
+      rs = 2;
+      const objs = [];
+      for (let i = 0; i < 140; i++) {
+        const cl = rnd() < 0.5;
+        objs.push({
+          id: i,
+          x: cl ? 300 + rnd() * 150 : rnd() * WORLD,
+          y: cl ? 260 + rnd() * 170 : rnd() * WORLD,
+          vx: (rnd() - 0.5) * 18,
+          vy: (rnd() - 0.5) * 18,
+          b: { w: 5, h: 5 },
+        });
+      }
+      const tree = new QT(4, 0.25, true, { x: 0, y: 0, s: WORLD });
+      for (const o of objs) {
+        o.b.x = o.x;
+        o.b.y = o.y;
+        tree.add(o);
+      }
+      frame((t, dt) => {
+        const S = Math.min(W, H) - 8,
+          k = S / WORLD,
+          X = (W - S) / 2,
+          Y = (H - S) / 2,
+          s = t / 1000,
+          q = 80;
+        for (const o of objs) {
+          o.x += o.vx * dt;
+          o.y += o.vy * dt;
+          if (o.x < 4 || o.x > WORLD - 10) o.vx *= -1;
+          if (o.y < 4 || o.y > WORLD - 10) o.vy *= -1;
+          o.b.x = o.x;
+          o.b.y = o.y;
+          tree.move(o);
+        }
+        const a = {
+            x: WORLD / 2 + Math.sin(s * 0.3) * 150 - q / 2,
+            y: WORLD / 2 + Math.cos(s * 0.41) * 150 - q / 2,
+            w: q,
+            h: q,
+          },
+          found = new Set(tree.query(a));
+        cells(tree, X, Y, k, '#34505A', 1.5);
+        g.strokeStyle = C.teal;
+        g.lineWidth = 3;
+        g.beginPath();
+        for (const n of tree.visited) g.rect(X + n.x * k, Y + n.y * k, n.s * k, n.s * k);
+        g.stroke();
+        g.fillStyle = '#6E828A';
+        g.beginPath();
+        for (const o of objs) if (!found.has(o)) dot(X + o.x * k, Y + o.y * k, 5);
+        g.fill();
+        g.fillStyle = C.yellow;
+        g.beginPath();
+        for (const o of found) dot(X + o.x * k, Y + o.y * k, 6);
+        g.fill();
+        g.strokeStyle = '#F2F5F3';
+        g.lineWidth = 2.5;
+        g.strokeRect(X + a.x * k, Y + a.y * k, q * k, q * k);
+      });
+    </script>
+    <script type="text/plain" id="embed-split">
+      const WORLD = 512;
+      let tree,
+        pts,
+        added,
+        timer,
+        flash = new Map(),
+        pause = 0;
+      function reset() {
+        rs = 11;
+        tree = new QT(4, 0, false, { x: 0, y: 0, s: WORLD });
+        pts = [];
+        for (let i = 0; i < 46; i++) {
+          const cl = rnd() < 0.7;
+          const cx = cl ? 120 + rnd() * 110 : rnd() * WORLD,
+            cy = cl ? 110 + rnd() * 120 : rnd() * WORLD;
+          pts.push({ id: i, b: { x: Math.min(WORLD - 1, cx), y: Math.min(WORLD - 1, cy), w: 0, h: 0 } });
+        }
+        added = 0;
+        timer = 0;
+        flash.clear();
+        pause = 0;
+      }
+      reset();
+      frame((t, dt) => {
+        const S = Math.min(H - 24, W * 0.64),
+          X = 12,
+          Y = 12,
+          k = S / WORLD;
+        timer += dt;
+        if (added < pts.length && timer > 0.42) {
+          timer = 0;
+          const before = new Set(tree.nodes());
+          tree.add(pts[added++]);
+          for (const n of tree.nodes()) if (!before.has(n)) flash.set(n, t);
+        }
+        if (added >= pts.length) {
+          pause += dt;
+          if (pause > 3) reset();
+        }
+        panel(X, Y, S);
+        cells(tree, X, Y, k, C.cell, 2);
+        for (const [n, t0] of flash) {
+          const a = 1 - (t - t0) / 900;
+          if (a <= 0) {
+            flash.delete(n);
+            continue;
+          }
+          g.globalAlpha = a;
+          g.strokeStyle = C.yellow;
+          g.lineWidth = 5;
+          g.strokeRect(X + n.x * k, Y + n.y * k, n.s * k, n.s * k);
+        }
+        g.globalAlpha = 1;
+        g.strokeStyle = C.ink;
+        g.lineWidth = 3;
+        g.strokeRect(X + 1.5, Y + 1.5, S - 3, S - 3);
+        g.fillStyle = C.mute;
+        g.beginPath();
+        for (let i = 0; i < added; i++) {
+          const p = pts[i].b;
+          dot(X + p.x * k, Y + p.y * k, 7);
+        }
+        g.fill();
+        if (added) {
+          const p = pts[added - 1].b,
+            a = Math.max(0, 1 - timer / 0.42);
+          g.fillStyle = C.yellow;
+          g.beginPath();
+          dot(X + p.x * k, Y + p.y * k, 7 + 6 * a);
+          g.fill();
+        }
+        const R = X + S + 48;
+        txt('объектов', R, 70, 28, C.mute);
+        txt(String(added), R, 140, 72, C.ink, 700);
+        txt('ячеек', R, 230, 28, C.mute);
+        txt(String(tree.nodes().filter((n) => !n.c).length), R, 300, 72, C.teal, 700);
+        txt('в ячейке — до 4', R, 390, 28, C.mute);
+        txt('пятый объект —', R, 436, 28, C.mute);
+        txt('ячейка делится', R, 474, 28, C.mute);
+      });
+    </script>
+    <script type="text/plain" id="embed-search">
+      const WORLD = 512,
+        N = 160;
+      rs = 5;
+      const tree = new QT(4, 0, false, { x: 0, y: 0, s: WORLD }),
+        pts = [];
+      for (let i = 0; i < N; i++) {
+        const cl = rnd() < 0.45,
+          cx = cl ? 330 + rnd() * 140 : rnd() * WORLD,
+          cy = cl ? 60 + rnd() * 160 : rnd() * WORLD;
+        const o = { id: i, b: { x: Math.min(WORLD - 6, cx), y: Math.min(WORLD - 6, cy), w: 6, h: 6 } };
+        pts.push(o);
+        tree.add(o);
+      }
+      frame((t) => {
+        const gap = 40,
+          S = Math.min(H - 70, (W - gap - 24) / 2),
+          k = S / WORLD,
+          Y = 12,
+          X1 = 12,
+          X2 = X1 + S + gap,
+          q = 70,
+          s = t / 1000;
+        const qx = WORLD / 2 + Math.sin(s * 0.55) * 180 - q / 2,
+          qy = WORLD / 2 + Math.sin(s * 0.9 + 1) * 170 - q / 2,
+          a = { x: qx, y: qy, w: q, h: q };
+        const found = tree.query(a),
+          vis = new Set(tree.visited),
+          checked = tree.checked;
+        for (const [X, brute] of [
+          [X1, true],
+          [X2, false],
+        ]) {
+          panel(X, Y, S);
+          if (!brute) {
+            cells(tree, X, Y, k, C.cell, 1.5);
+            g.fillStyle = 'rgba(154,167,172,.18)';
+            for (const n of tree.nodes())
+              if (!n.c && !vis.has(n)) g.fillRect(X + n.x * k, Y + n.y * k, n.s * k, n.s * k);
+            g.strokeStyle = C.teal;
+            g.lineWidth = 3.5;
+            g.beginPath();
+            for (const n of vis) g.rect(X + n.x * k, Y + n.y * k, n.s * k, n.s * k);
+            g.stroke();
+          } else {
+            g.strokeStyle = 'rgba(214,54,90,.22)';
+            g.lineWidth = 1;
+            g.beginPath();
+            const cx = X + (qx + q / 2) * k,
+              cy = Y + (qy + q / 2) * k;
+            for (const o of pts) {
+              g.moveTo(cx, cy);
+              g.lineTo(X + (o.b.x + 3) * k, Y + (o.b.y + 3) * k);
+            }
+            g.stroke();
+          }
+          const chk = new Set();
+          if (!brute) for (const n of vis) for (const o of n.e.values()) chk.add(o);
+          g.fillStyle = C.gray;
+          g.beginPath();
+          for (const o of pts) if (!(brute || chk.has(o))) box(o.b, X, Y, k);
+          g.fill();
+          g.fillStyle = C.ink;
+          g.beginPath();
+          for (const o of pts) if ((brute || chk.has(o)) && !found.includes(o)) box(o.b, X, Y, k);
+          g.fill();
+          g.fillStyle = C.yellow;
+          g.beginPath();
+          for (const o of found) box(o.b, X, Y, k);
+          g.fill();
+          g.strokeStyle = C.ink;
+          g.lineWidth = 3;
+          g.strokeRect(X + qx * k, Y + qy * k, q * k, q * k);
+          const n = brute ? N : checked;
+          txt(
+            (brute ? 'перебор: ' : 'дерево: ') + 'проверено ' + n + ' из ' + N,
+            X,
+            Y + S + 44,
+            28,
+            brute ? C.red : C.teal,
+            600,
+          );
+        }
+      });
+    </script>
+    <script type="text/plain" id="embed-problem">
+      const PANELS = [0];
+      const WORLD = 256,
+        trees = PANELS.map((k) => {
+          const tr = new QT(4, k, false, { x: 0, y: 0, s: WORLD });
+          [
+            [40, 40],
+            [60, 200],
+            [200, 190],
+            [210, 40],
+            [120, 140],
+            [180, 220],
+          ].forEach((p, i) => tr.add({ id: 'p' + i, b: { x: p[0], y: p[1], w: 10, h: 10 } }));
+          return tr;
+        });
+      const obj = { id: 'o', b: { x: 60, y: 70, w: 26, h: 26 } };
+      trees.forEach((tr) => tr.add(obj));
+      frame((t) => {
+        const n = PANELS.length,
+          gap = 48,
+          S = Math.min(H - 80, (W - gap * (n - 1) - 24) / n),
+          k = S / WORLD,
+          Y = 12;
+        obj.b.x = WORLD / 2 - 13 + Math.sin(t / 1400) * 80;
+        PANELS.forEach((lo, i) => {
+          const tr = trees[i],
+            X = 12 + i * (S + gap);
+          tr.move(obj);
+          const own = tr.own.get('o'),
+            inRoot = own === tr.root;
+          panel(X, Y, S);
+          if (!inRoot) {
+            g.fillStyle = C.soft;
+            g.fillRect(X + own.x * k, Y + own.y * k, own.s * k, own.s * k);
+            if (lo > 0) {
+              g.setLineDash([10, 8]);
+              g.strokeStyle = C.teal;
+              g.lineWidth = 3;
+              g.strokeRect(X + own.l.x * k, Y + own.l.y * k, own.l.w * k, own.l.h * k);
+              g.setLineDash([]);
+            }
+          } else {
+            g.fillStyle = 'rgba(214,54,90,.08)';
+            g.fillRect(X, Y, S, S);
+          }
+          cells(tr, X, Y, k, C.gray, 2.5);
+          g.strokeStyle = C.ink;
+          g.lineWidth = 3;
+          g.strokeRect(X + 1.5, Y + 1.5, S - 3, S - 3);
+          g.fillStyle = C.mute;
+          g.beginPath();
+          for (const nd of tr.nodes()) for (const o of nd.e.values()) if (o !== obj) box(o.b, X, Y, k);
+          g.fill();
+          g.fillStyle = inRoot ? C.red : C.teal;
+          g.beginPath();
+          box(obj.b, X, Y, k);
+          g.fill();
+          g.save();
+          g.beginPath();
+          g.rect(X, Y + S + 8, S, 60);
+          g.clip();
+          txt(lo > 0 ? 'рыхлое:' : 'обычное:', X, Y + S + 46, 28, C.ink, 700);
+          txt(
+            inRoot ? 'застрял в корне' : 'лежит в четверти',
+            X + (lo > 0 ? 120 : 140),
+            Y + S + 46,
+            28,
+            inRoot ? C.red : C.teal,
+            600,
+          );
+          g.restore();
+        });
+      });
+    </script>
+    <script type="text/plain" id="embed-problem-demo">
+      const WORLD = 512;
+      rs = 3;
+      const trees = [
+          new QT(4, 0, false, { x: 0, y: 0, s: WORLD }),
+          new QT(4, 0.25, false, { x: 0, y: 0, s: WORLD }),
+        ],
+        objs = [];
+      for (let i = 0; i < 420; i++) {
+        const x = Math.round(rnd() * 15 + 0.5) * 32 - 4,
+          y = Math.round(rnd() * 15 + 0.5) * 32 - 4,
+          jx = rnd() < 0.5 ? 0 : 16,
+          jy = rnd() < 0.5 ? 0 : 16;
+        const o = {
+          id: i,
+          b: { x: Math.min(WORLD - 8, x + jx), y: Math.min(WORLD - 8, y + jy), w: 8, h: 8 },
+        };
+        objs.push(o);
+        trees.forEach((tr) => tr.add(o));
+      }
+      const stuck = trees.map((tr) => {
+        const s = new Set();
+        for (const n of tr.nodes()) if (n.d <= 1) for (const o of n.e.values()) s.add(o);
+        return s;
+      });
+      frame((t) => {
+        const gap = 48,
+          S = Math.min(H - 80, (W - gap - 24) / 2),
+          k = S / WORLD,
+          Y = 12,
+          q = 56,
+          s = t / 1000;
+        const a = {
+          x: WORLD / 2 + Math.sin(s * 0.5) * 190 - q / 2,
+          y: WORLD / 2 + Math.cos(s * 0.73) * 180 - q / 2,
+          w: q,
+          h: q,
+        };
+        trees.forEach((tr, i) => {
+          const X = 12 + i * (S + gap),
+            found = new Set(tr.query(a));
+          panel(X, Y, S);
+          cells(tr, X, Y, k, C.cell, 1.5);
+          g.strokeStyle = C.teal;
+          g.lineWidth = 3;
+          g.beginPath();
+          for (const n of tr.visited) g.rect(X + n.x * k, Y + n.y * k, n.s * k, n.s * k);
+          g.stroke();
+          for (const [col, test] of [
+            [C.gray, (o) => !stuck[i].has(o) && !found.has(o)],
+            [C.red, (o) => stuck[i].has(o) && !found.has(o)],
+            [C.yellow, (o) => found.has(o)],
+          ]) {
+            g.fillStyle = col;
+            g.beginPath();
+            for (const o of objs) if (test(o)) box(o.b, X, Y, k);
+            g.fill();
+          }
+          g.strokeStyle = C.ink;
+          g.lineWidth = 3;
+          g.strokeRect(X + a.x * k, Y + a.y * k, q * k, q * k);
+          txt(
+            (i ? 'рыхлое' : 'обычное') + ': проверено ' + tr.checked,
+            X,
+            Y + S + 44,
+            28,
+            i ? C.teal : C.red,
+            600,
+          );
+          txt('застряло наверху: ' + stuck[i].size, X + S, Y + S + 44, 26, C.mute, 500, 'right');
+        });
+      });
+    </script>
+    <script type="text/plain" id="embed-loose">
+      const PANELS = [0, 0.25];
+      const WORLD = 256,
+        trees = PANELS.map((k) => {
+          const tr = new QT(4, k, false, { x: 0, y: 0, s: WORLD });
+          [
+            [40, 40],
+            [60, 200],
+            [200, 190],
+            [210, 40],
+            [120, 140],
+            [180, 220],
+          ].forEach((p, i) => tr.add({ id: 'p' + i, b: { x: p[0], y: p[1], w: 10, h: 10 } }));
+          return tr;
+        });
+      const obj = { id: 'o', b: { x: 60, y: 70, w: 26, h: 26 } };
+      trees.forEach((tr) => tr.add(obj));
+      frame((t) => {
+        const n = PANELS.length,
+          gap = 48,
+          S = Math.min(H - 80, (W - gap * (n - 1) - 24) / n),
+          k = S / WORLD,
+          Y = 12;
+        obj.b.x = WORLD / 2 - 13 + Math.sin(t / 1400) * 80;
+        PANELS.forEach((lo, i) => {
+          const tr = trees[i],
+            X = 12 + i * (S + gap);
+          tr.move(obj);
+          const own = tr.own.get('o'),
+            inRoot = own === tr.root;
+          panel(X, Y, S);
+          if (!inRoot) {
+            g.fillStyle = C.soft;
+            g.fillRect(X + own.x * k, Y + own.y * k, own.s * k, own.s * k);
+            if (lo > 0) {
+              g.setLineDash([10, 8]);
+              g.strokeStyle = C.teal;
+              g.lineWidth = 3;
+              g.strokeRect(X + own.l.x * k, Y + own.l.y * k, own.l.w * k, own.l.h * k);
+              g.setLineDash([]);
+            }
+          } else {
+            g.fillStyle = 'rgba(214,54,90,.08)';
+            g.fillRect(X, Y, S, S);
+          }
+          cells(tr, X, Y, k, C.gray, 2.5);
+          g.strokeStyle = C.ink;
+          g.lineWidth = 3;
+          g.strokeRect(X + 1.5, Y + 1.5, S - 3, S - 3);
+          g.fillStyle = C.mute;
+          g.beginPath();
+          for (const nd of tr.nodes()) for (const o of nd.e.values()) if (o !== obj) box(o.b, X, Y, k);
+          g.fill();
+          g.fillStyle = inRoot ? C.red : C.teal;
+          g.beginPath();
+          box(obj.b, X, Y, k);
+          g.fill();
+          g.save();
+          g.beginPath();
+          g.rect(X, Y + S + 8, S, 60);
+          g.clip();
+          txt(lo > 0 ? 'рыхлое:' : 'обычное:', X, Y + S + 46, 28, C.ink, 700);
+          txt(
+            inRoot ? 'застрял в корне' : 'лежит в четверти',
+            X + (lo > 0 ? 120 : 140),
+            Y + S + 46,
+            28,
+            inRoot ? C.red : C.teal,
+            600,
+          );
+          g.restore();
+        });
+      });
+    </script>
+    <script type="text/plain" id="embed-two-phase">
+      const WORLD = 512;
+      rs = 9;
+      const tree = new QT(4, 0.25, false, { x: 0, y: 0, s: WORLD }),
+        objs = [];
+      for (let i = 0; i < 150; i++) {
+        const round = rnd() < 0.55,
+          x = 20 + rnd() * 472,
+          y = 20 + rnd() * 472,
+          r = 6 + rnd() * 12;
+        const o = round
+          ? { id: i, c: { x, y, r }, b: { x: x - r, y: y - r, w: 2 * r, h: 2 * r } }
+          : { id: i, b: { x, y, w: 10 + rnd() * 16, h: 10 + rnd() * 16 } };
+        objs.push(o);
+        tree.add(o);
+      }
+      const dist = (o, p) => {
+        if (o.c) return Math.max(0, Math.hypot(o.c.x - p.x, o.c.y - p.y) - o.c.r);
+        const b = o.b,
+          nx = Math.max(b.x, Math.min(p.x, b.x + b.w)),
+          ny = Math.max(b.y, Math.min(p.y, b.y + b.h));
+        return Math.hypot(nx - p.x, ny - p.y);
+      };
+      function shape(o, X, Y, k) {
+        if (o.c) dot(X + o.c.x * k, Y + o.c.y * k, o.c.r * k);
+        else box(o.b, X, Y, k);
+      }
+      frame((t) => {
+        const S = Math.min(H - 24, W * 0.62),
+          k = S / WORLD,
+          X = 12,
+          Y = 12,
+          s = t / 1000,
+          R = 62;
+        const p = { x: WORLD / 2 + Math.sin(s * 0.45) * 170, y: WORLD / 2 + Math.sin(s * 0.7 + 2) * 160 },
+          a = { x: p.x - R, y: p.y - R, w: 2 * R, h: 2 * R };
+        const cand = tree.query(a),
+          found = new Set(cand.filter((o) => dist(o, p) <= R));
+        panel(X, Y, S);
+        cells(tree, X, Y, k, C.cell, 1.5);
+        g.fillStyle = C.gray;
+        g.beginPath();
+        for (const o of objs) if (!found.has(o)) shape(o, X, Y, k);
+        g.fill();
+        g.fillStyle = C.yellow;
+        g.beginPath();
+        for (const o of found) shape(o, X, Y, k);
+        g.fill();
+        g.strokeStyle = C.yellow;
+        g.lineWidth = 3.5;
+        g.beginPath();
+        for (const o of cand) if (!found.has(o)) box(o.b, X, Y, k);
+        g.stroke();
+        g.setLineDash([8, 8]);
+        g.strokeStyle = C.mute;
+        g.lineWidth = 2;
+        g.strokeRect(X + a.x * k, Y + a.y * k, a.w * k, a.h * k);
+        g.setLineDash([]);
+        g.strokeStyle = C.ink;
+        g.lineWidth = 3.5;
+        g.beginPath();
+        g.arc(X + p.x * k, Y + p.y * k, R * k, 0, 7);
+        g.stroke();
+        const L = X + S + 48;
+        txt('1. по рамкам', L, 70, 30, C.mute);
+        txt(cand.length + ' кандидатов', L, 124, 44, C.ink, 700);
+        txt('2. по форме', L, 220, 30, C.mute);
+        txt(found.size + ' найдено', L, 274, 44, C.teal, 700);
+        txt('отсеяно: ' + (cand.length - found.size), L, 360, 30, '#B98700', 600);
+      });
+    </script>
+    <script type="text/plain" id="embed-root">
+      let tree, objs, i, timer, view, glow, pause;
+      function reset() {
+        rs = 21;
+        tree = new QT(4, 0, false, null);
+        objs = [];
+        let ang = 0;
+        for (let j = 0; j < 16; j++) {
+          ang += 1.9;
+          const d = 3 + Math.pow(1.55, j);
+          objs.push({ id: j, b: { x: Math.cos(ang) * d, y: Math.sin(ang) * d, w: 1.5, h: 1.5 } });
+        }
+        i = 0;
+        timer = 0;
+        view = null;
+        glow = null;
+        pause = 0;
+        tree.onGrow = (o, r) => {
+          glow = { n: o, t: performance.now() };
+        };
+      }
+      reset();
+      frame((t, dt) => {
+        timer += dt;
+        if (i < objs.length && timer > 0.9) {
+          timer = 0;
+          tree.add(objs[i++]);
+        }
+        if (i >= objs.length) {
+          pause += dt;
+          if (pause > 3) reset();
+        }
+        const S = Math.min(H - 24, W * 0.6),
+          X = 12,
+          Y = 12;
+        panel(X, Y, S);
+        if (!tree.root) return;
+        const r = tree.root,
+          want = { x: r.x, y: r.y, s: r.s };
+        view = view
+          ? {
+              x: view.x + (want.x - view.x) * 0.06,
+              y: view.y + (want.y - view.y) * 0.06,
+              s: view.s + (want.s - view.s) * 0.06,
+            }
+          : want;
+        const k = S / view.s,
+          ox = X - view.x * k,
+          oy = Y - view.y * k;
+        g.save();
+        g.beginPath();
+        g.rect(X, Y, S, S);
+        g.clip();
+        if (glow) {
+          const a = 1 - (t - glow.t) / 1400;
+          if (a > 0) {
+            g.globalAlpha = a * 0.8;
+            g.fillStyle = C.soft;
+            g.fillRect(ox + glow.n.x * k, oy + glow.n.y * k, glow.n.s * k, glow.n.s * k);
+            g.globalAlpha = 1;
+            g.strokeStyle = C.teal;
+            g.lineWidth = 5;
+            g.strokeRect(ox + glow.n.x * k, oy + glow.n.y * k, glow.n.s * k, glow.n.s * k);
+          }
+        }
+        cells(tree, ox, oy, k, C.gray, 2);
+        g.fillStyle = C.mute;
+        g.beginPath();
+        for (let j = 0; j < i - 1; j++) {
+          const b = objs[j].b;
+          dot(ox + b.x * k, oy + b.y * k, 7);
+        }
+        g.fill();
+        if (i) {
+          const b = objs[i - 1].b;
+          g.fillStyle = C.yellow;
+          g.beginPath();
+          dot(ox + b.x * k, oy + b.y * k, 10);
+          g.fill();
+        }
+        g.restore();
+        g.strokeStyle = C.ink;
+        g.lineWidth = 3;
+        g.strokeRect(X + 1.5, Y + 1.5, S - 3, S - 3);
+        const L = X + S + 48;
+        txt('сторона корня', L, 70, 28, C.mute);
+        txt(String(r.s), L, 140, 72, C.teal, 700);
+        txt('объектов', L, 230, 28, C.mute);
+        txt(String(i), L, 300, 72, C.ink, 700);
+        txt('старый корень —', L, 400, 28, C.mute);
+        txt('четверть нового', L, 440, 28, C.mute);
+      });
+    </script>
+    <script type="text/plain" id="embed-merge-anim">
+      const WORLD = 512;
+      rs = 13;
+      const trees = [
+          new QT(4, 0.25, false, { x: 0, y: 0, s: WORLD }),
+          new QT(4, 0.25, true, { x: 0, y: 0, s: WORLD }),
+        ],
+        objs = [];
+      for (let i = 0; i < 36; i++) {
+        const o = {
+          id: i,
+          dx: (rnd() - 0.5) * 70,
+          dy: (rnd() - 0.5) * 70,
+          b: { x: 0, y: 0, w: 6, h: 6 },
+        };
+        objs.push(o);
+      }
+      let ang = 0,
+        first = true;
+      frame((t, dt) => {
+        ang += dt * 0.5;
+        const cx = WORLD / 2 + Math.cos(ang) * 170,
+          cy = WORLD / 2 + Math.sin(ang * 1.3) * 170;
+        for (const o of objs) {
+          o.b.x = cx + o.dx;
+          o.b.y = cy + o.dy;
+          trees.forEach((tr) => (first ? tr.add(o) : tr.move(o)));
+        }
+        first = false;
+        const gap = 48,
+          S = Math.min(H - 80, (W - gap - 24) / 2),
+          k = S / WORLD,
+          Y = 12;
+        trees.forEach((tr, i) => {
+          const X = 12 + i * (S + gap),
+            ns = tr.nodes();
+          panel(X, Y, S);
+          cells(tr, X, Y, k, i ? C.teal : C.red, 1.8);
+          g.fillStyle = C.yellow;
+          g.beginPath();
+          for (const o of objs) box(o.b, X, Y, k);
+          g.fill();
+          txt(
+            (i ? 'склеиваем: ' : 'не склеиваем: ') + ns.length + ' узлов',
+            X,
+            Y + S + 44,
+            28,
+            i ? C.teal : C.red,
+            600,
+          );
+        });
+      });
+    </script>
+    <script>
+      const deck = document.querySelector('.deck');
+      const slides = [...deck.children];
+      const counter = document.querySelector('.counter');
+      const notes = document.querySelector('.notes');
+      const embedCore = document.getElementById('embed-core').textContent;
+
+      let current = -1;
+      let step = 0;
+
+      function slideFromHash() {
+        const number = Number.parseInt(location.hash.slice(1), 10);
+        return Number.isInteger(number) ? number - 1 : 0;
+      }
+
+      function fitToWindow() {
+        const scale = Math.min(innerWidth / 1920, innerHeight / 1080);
+        deck.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      }
+
+      function buildSteps(slide) {
+        return [...slide.querySelectorAll('[data-build-in]')].map(
+          (element) => Number(element.dataset.buildIn.split(' ')[1]) || 1,
+        );
+      }
+
+      function showBuilds(slide) {
+        for (const element of slide.querySelectorAll('[data-build-in]')) {
+          const order = Number(element.dataset.buildIn.split(' ')[1]) || 1;
+          element.classList.toggle('waiting', order > step);
+        }
+      }
+
+      function startEmbeds(slide) {
+        for (const box of slide.querySelectorAll('.embed')) {
+          const scene = document.getElementById(`embed-${box.dataset.embed}`).textContent;
+          const frame = document.createElement('iframe');
+          frame.sandbox = 'allow-scripts';
+          frame.srcdoc =
+            '<!doctype html><meta charset="utf-8"><style>' +
+            'html,body{margin:0;height:100%;overflow:hidden;background:transparent}' +
+            'canvas{display:block;width:100%;height:100%}</style>' +
+            `<canvas id="c"></canvas><script>${embedCore}\n${scene}<\/script>`;
+          box.replaceChildren(frame);
+        }
+      }
+
+      function stopEmbeds(slide) {
+        for (const box of slide.querySelectorAll('.embed')) {
+          box.replaceChildren();
+        }
+      }
+
+      function show(index, fromEnd = false) {
+        index = Math.max(0, Math.min(slides.length - 1, index));
+        if (index === current) {
+          return;
+        }
+        if (current >= 0) {
+          slides[current].classList.remove('current');
+          stopEmbeds(slides[current]);
+        }
+        current = index;
+        const slide = slides[current];
+        step = fromEnd ? Math.max(0, ...buildSteps(slide)) : 0;
+        showBuilds(slide);
+        slide.classList.add('current');
+        startEmbeds(slide);
+        counter.textContent = `${current + 1} / ${slides.length}`;
+        notes.textContent = slide.querySelector('aside')?.textContent ?? '';
+        history.replaceState(null, '', `#${current + 1}`);
+      }
+
+      function next() {
+        const steps = buildSteps(slides[current]);
+        if (steps.some((order) => order > step)) {
+          step = Math.min(...steps.filter((order) => order > step));
+          showBuilds(slides[current]);
+        } else {
+          show(current + 1);
+        }
+      }
+
+      function previous() {
+        show(current - 1, true);
+      }
+
+      addEventListener('keydown', (event) => {
+        if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(event.key)) {
+          next();
+        } else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(event.key)) {
+          previous();
+        } else if (event.key === 'Home') {
+          show(0);
+        } else if (event.key === 'End') {
+          show(slides.length - 1, true);
+        } else if (event.key === 'n' || event.key === 'т') {
+          notes.hidden = !notes.hidden;
+        } else if (event.key === 'f' || event.key === 'а') {
+          toggleFullscreen();
+        } else {
+          return;
+        }
+        event.preventDefault();
+      });
+
+      function toggleFullscreen() {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen?.();
+        }
+      }
+
+      document.querySelector('.viewport').addEventListener('click', (event) => {
+        if (event.clientX < innerWidth / 3) {
+          previous();
+        } else {
+          next();
+        }
+      });
+
+      let touchStartX = 0;
+      addEventListener('touchstart', (event) => {
+        touchStartX = event.touches[0].clientX;
+      });
+      addEventListener('touchend', (event) => {
+        const dx = event.changedTouches[0].clientX - touchStartX;
+        if (dx < -40) {
+          next();
+        } else if (dx > 40) {
+          previous();
+        }
+      });
+
+      document.querySelector('[data-go="-1"]').addEventListener('click', previous);
+      document.querySelector('[data-go="1"]').addEventListener('click', next);
+      document.querySelector('[data-notes]').addEventListener('click', () => {
+        notes.hidden = !notes.hidden;
+      });
+      document.querySelector('[data-fullscreen]').addEventListener('click', toggleFullscreen);
+
+      addEventListener('resize', fitToWindow);
+      addEventListener('hashchange', () => show(slideFromHash()));
+      fitToWindow();
+      show(slideFromHash());
+    </script>
+  </body>
+</html>

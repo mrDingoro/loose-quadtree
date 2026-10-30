@@ -1,0 +1,62 @@
+{
+  "name": "loose-quadtree",
+  "version": "1.0.0",
+  "description": "Loose quadtree spatial index for 2D shapes: intersections, above/below and radius queries with fast inserts, moves and removals",
+  "keywords": [
+    "quadtree",
+    "loose-quadtree",
+    "spatial-index",
+    "collision",
+    "intersection",
+    "geometry",
+    "2d",
+    "gamedev"
+  ],
+  "author": "Михаил Староверов <dingoro@yandex.ru>",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "prepublishOnly": "npm run lint && npm test && npm run build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "benchmark": "tsc -p tsconfig.benchmarks.json && node .bench-dist/benchmarks/scaling.js",
+    "example:basics": "tsc -p tsconfig.benchmarks.json && node .bench-dist/examples/basics.js",
+    "example:horde": "tsc -p tsconfig.benchmarks.json && node .bench-dist/examples/horde.js",
+    "demo": "npm run build && node scripts/serve-demo.mjs",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.4",
+    "@types/node": "22.16.5",
+    "eslint": "9.39.4",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "16.3.0",
+    "prettier": "3.6.2",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.1",
+    "vitest": "4.1.11"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrDingoro/loose-quadtree.git"
+  },
+  "homepage": "https://mrdingoro.github.io/loose-quadtree/"
+}

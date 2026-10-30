@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Рыхлое квадродерево</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&display=swap"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="life" aria-hidden="true"></canvas>
+    <div class="life-controls" id="life-controls" title="Фон — игра «Жизнь» на том же SpatialIndex">
+      <button data-life="play" aria-label="Запустить фон">
+        <svg width="14" height="14" viewBox="0 0 14 14">
+          <path
+            d="M3 1.5v11l9-5.5z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+      <button data-life="pause" aria-label="Пауза">
+        <svg width="14" height="14" viewBox="0 0 14 14">
+          <path
+            d="M3 2h2.6v10H3zM8.4 2H11v10H8.4z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+          />
+        </svg>
+      </button>
+      <button data-life="step" aria-label="Одно поколение">
+        <svg width="14" height="14" viewBox="0 0 14 14">
+          <path
+            d="M2 2v10l7-5z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linejoin="round"
+          />
+          <path d="M11.5 2v10" stroke="currentColor" stroke-width="1.8" />
+        </svg>
+      </button>
+      <button data-life="close" aria-label="Убрать фон">
+        <svg width="14" height="14" viewBox="0 0 14 14">
+          <path d="M2.5 2.5l9 9M11.5 2.5l-9 9" stroke="currentColor" stroke-width="1.8" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="page">
+      <h1>Рыхлое квадродерево</h1>
+      <p class="lead">
+        Курсовая: библиотека, которая быстро находит фигуры рядом с данной. Ведите мышью по полю —
+        запрос следует за курсором. Код и описание —
+        <a href="https://github.com/mrDingoro/loose-quadtree">на GitHub</a>, объяснение —
+        <a href="slides.html">в презентации</a>.
+      </p>
+
+      <div class="card">
+        <div class="stage">
+          <canvas id="view"></canvas>
+          <div class="legend">
+            <span><span class="swatch round" style="background: var(--yellow)"></span>найдено</span>
+            <span><span class="swatch outline"></span>рамка задета, фигура — нет</span>
+            <span
+              ><span class="swatch" style="background: var(--stuck)"></span>застряло наверху
+              дерева</span
+            >
+            <span><span class="swatch frame"></span>узлы, куда зашёл запрос</span>
+          </div>
+          <dl class="numbers">
+            <div class="key">
+              <dt>записей проверено</dt>
+              <dd id="checked">—</dd>
+            </div>
+            <div>
+              <dt>узлов посещено</dt>
+              <dd id="nodes">—</dd>
+            </div>
+            <div>
+              <dt>кандидатов по рамкам</dt>
+              <dd id="candidates">—</dd>
+            </div>
+            <div>
+              <dt>найдено</dt>
+              <dd id="found">—</dd>
+            </div>
+            <div>
+              <dt>застряло наверху</dt>
+              <dd id="stuck">—</dd>
+            </div>
+            <div>
+              <dt>через дерево</dt>
+              <dd id="time-tree">—</dd>
+            </div>
+            <div>
+              <dt>перебором</dt>
+              <dd id="time-linear">—</dd>
+            </div>
+          </dl>
+        </div>
+
+        <aside class="panel">
+          <div class="settings">
+            <div class="setting">
+              <span class="name">Дерево</span>
+              <div class="segmented" data-setting="tree" role="group" aria-label="Дерево">
+                <button data-value="loose" aria-pressed="true">рыхлое</button>
+                <button data-value="plain" aria-pressed="false">обычное</button>
+              </div>
+            </div>
+            <div class="setting">
+              <span class="name">Объектов</span>
+              <div class="segmented" data-setting="count" role="group" aria-label="Объектов">
+                <button data-value="300" aria-pressed="false">300</button>
+                <button data-value="2000" aria-pressed="true">2 000</button>
+                <button data-value="10000" aria-pressed="false">10 000</button>
+                <button data-value="50000" aria-pressed="false">50 000</button>
+              </div>
+            </div>
+            <div class="setting">
+              <span class="name">Набор</span>
+              <div class="segmented" data-setting="layout" role="group" aria-label="Набор">
+                <button data-value="shapes" aria-pressed="true">фигуры</button>
+                <button data-value="tiles" aria-pressed="false">тайлы</button>
+              </div>
+            </div>
+            <div class="setting">
+              <span class="name">Запрос</span>
+              <div class="segmented" data-setting="query" role="group" aria-label="Запрос">
+                <button data-value="square" aria-pressed="true">квадрат</button>
+                <button data-value="circle" aria-pressed="false">круг</button>
+                <button data-value="above" aria-pressed="false">выше</button>
+                <button data-value="below" aria-pressed="false">ниже</button>
+              </div>
+            </div>
+            <label class="setting">
+              <span class="name">Размер запроса</span>
+              <input data-setting="size" type="range" min="10" max="400" value="120" />
+            </label>
+            <label class="check"
+              ><input data-setting="moving" type="checkbox" /> двигать объекты</label
+            >
+            <label class="check"
+              ><input data-setting="showLoose" type="checkbox" checked /> показывать рыхлые
+              области</label
+            >
+          </div>
+        </aside>
+      </div>
+
+      <p class="note">
+        Время зависит от компьютера, а число проверенных записей — нет. Попробуйте 50 000 объектов и
+        обычное дерево. Запросы «выше» и «ниже» находят полмира: тут перебор бывает быстрее дерева,
+        результат всё равно нужно выписать целиком.
+      </p>
+
+      <section class="explain">
+        <div>
+          <h2>Почему «рыхлое»</h2>
+          <p>
+            Обычное квадродерево делит ячейку на четыре четверти. Объект на линии раздела не
+            помещается ни в одну из них и остаётся наверху. Таких объектов тем больше, чем больше
+            мир, а проверяет их почти каждый запрос.
+          </p>
+          <p>
+            В рыхлом дереве у каждой четверти есть запас в четверть её стороны. Объект спускается в
+            ту четверть, где лежит его центр, если помещается в её область с запасом. Наверху
+            остаются только действительно крупные объекты.
+          </p>
+          <p>
+            Поиск идёт в две фазы: дерево отбирает кандидатов по рамкам, а точная проверка формы
+            отсеивает лишних — например, шар, у которого задет только угол рамки.
+          </p>
+          <p>Фон страницы — игра «Жизнь» на том же индексе: каждая клетка — точка в дереве.</p>
+        </div>
+        <img
+          src="./loose-quadtree.svg"
+          alt="Обычное и рыхлое квадродерево: объект на линии раздела"
+        />
+      </section>
+    </div>
+    <script type="module" src="./visualizer.js"></script>
+    <script type="module" src="./background-life.js"></script>
+  </body>
+</html>
